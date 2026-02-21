@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LkSG Compass — Lieferketten-Compliance. Messbar, audit-fest.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g0:#070A08;--g1:#0F1410;--g2:#1B3D2B;--g3:#2A5C3F;--g4:#3D7A57;--g5:#6CD49C;--g6:#A8E6C0;--g7:#D4EBD8;--g8:#EDF6EF;--g9:#F5FAF6;
+  --s:#FFFFFF;--s2:#F8F7F4;--s3:#EEECEA;--s4:#E3E0D8;--s5:#D5D0C6;
+  --t1:#080C09;--t2:#2D3330;--t3:#5A6360;--t4:#909890;--t5:#B8C0B8;
+  --e:#C0392B;--ep:#FDECEC;--w:#B45309;--wp:#FEF3C7;--b:#1E3A5F;--bp:#DBEAFE;
+  --r6:6px;--r10:10px;--r14:14px;--r20:20px;--r28:28px;
+  --sh4:0 24px 72px rgba(0,0,0,.14),0 8px 24px rgba(0,0,0,.08);
+}
+body{font-family:'Inter',sans-serif;color:var(--t1);background:var(--s2);overflow-x:hidden;scroll-behavior:smooth}
+a{color:inherit;text-decoration:none}
+.nav-links{display:flex;gap:18px;font-size:13px;color:var(--t3)}
+.nav-links a{padding:8px 10px;border-radius:10px}
+.nav-links a:hover{background:var(--g9);color:var(--g2)}
+.view{display:none}
+.view.active{display:block}
+.flex-view.active{display:flex}
+.nav{position:sticky;top:0;z-index:100;background:rgba(248,247,244,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--s4);padding:0 48px;height:58px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{display:flex;align-items:center;gap:10px;cursor:pointer;font-family:'Fraunces',serif;font-weight:900;color:var(--g2)}
+.nav-mark{width:28px;height:28px;background:var(--g2);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px}
+.hero{background:linear-gradient(160deg,#EDF6EF 0%,var(--s2) 60%);padding:80px 48px;position:relative}
+.hero-inner{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.hero-h1{font-family:'Fraunces',serif;font-size:52px;font-weight:900;line-height:1.1;margin-bottom:20px}
+.hero-h1 em{color:var(--g2);font-style:italic}
+.cta-primary{padding:14px 28px;background:var(--g2);color:#fff;border-radius:var(--r14);border:none;font-weight:700;cursor:pointer;transition:0.3s}
+.cta-primary:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(27,61,43,0.2)}
+.problem{background:var(--g1);padding:80px 48px;color:#fff}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+.step{padding:24px;background:var(--s);color:var(--t1);border-radius:var(--r20);border:1.5px solid var(--s4)}
+.step-n{width:28px;height:28px;background:var(--g9);color:var(--g3);display:flex;align-items:center;justify-content:center;border-radius:6px;margin-bottom:12px;font-family:'JetBrains Mono'}
+.pricing{padding:80px 48px}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1120px;margin:40px auto}
+.plan{background:#fff;padding:30px;border-radius:var(--r20);border:1.5px solid var(--s4);text-align:center}
+.plan.featured{background:var(--g2);color:#fff;border:none}
+.footer{padding:50px 48px;border-top:1px solid var(--s4);color:var(--t4);text-align:center}
+</style>
+</head>
+<body>
+
+<div id="view-landing" class="view active">
+    <nav class="nav">
+        <div class="nav-logo" onclick="window.scrollTo({top:0,behavior:'smooth'})"><div class="nav-mark">L</div> LkSG Compass</div>
+        <div class="nav-links">
+            <a href="#features">Funktionen</a>
+            <a href="#pricing">Preise</a>
+            <a href="/" title="Open App">App</a>
+        </div>
+        <a class="cta-primary" href="/" style="padding:8px 20px;display:inline-block">Login</a>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-inner">
+            <div>
+                <h1 class="hero-h1">Lieferketten-Compliance <em>audit-fest.</em></h1>
+                <p style="margin-bottom:30px; color:var(--t3)">53 Unterindikatoren, 40 Länder. BAFA-Jahresbericht auf Knopfdruck. Die erste LkSG-Software für den Mittelstand.</p>
+                <a class="cta-primary" href="/">Kostenlos Starten</a>
+            </div>
+            <div style="background:#fff; padding:20px; border-radius:20px; box-shadow:var(--sh4)">
+                <div style="font-weight:bold; margin-bottom:10px">Risiko-Index</div>
+                <div style="height:10px; background:var(--s4); border-radius:5px; overflow:hidden">
+                    <div style="width:75%; height:100%; background:var(--g5)"></div>
+                </div>
+                <p style="font-size:12px; margin-top:10px; color:var(--t4)">Aktuelle Abdeckung: 82% der Lieferanten geprüft.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="problem">
+        <div style="max-width:1120px; margin:0 auto">
+            <h2 style="font-family:Fraunces; font-size:40px; margin-bottom:40px">Warum LkSG Compass?</h2>
+            <div class="steps">
+                <div class="step"><div class="step-n">01</div><h3>Automatisierte Analyse</h3><p>Risk Engine + Country Dataset + Monitoring.</p></div>
+                <div class="step"><div class="step-n">02</div><h3>BAFA-Ready</h3><p>BAFA Report (Fragenkatalog-Struktur) als PDF Export.</p></div>
+                <div class="step"><div class="step-n">03</div><h3>Beschwerdeverfahren</h3><p>Public Whistleblower Portal pro Company.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing" class="pricing">
+        <h2 style="text-align:center; font-family:Fraunces; font-size:36px">Einfache Preisgestaltung</h2>
+        <div class="plans">
+            <div class="plan"><h3>Starter</h3><div style="font-size:32px; margin:20px 0">€299</div><p>bis 50 Lieferanten</p></div>
+            <div class="plan featured"><h3>Growth</h3><div style="font-size:32px; margin:20px 0">€999</div><p>bis 500 Lieferanten</p></div>
+            <div class="plan"><h3>Enterprise</h3><div style="font-size:32px; margin:20px 0">Individuell</div><p>Unlimited + Integrationen</p></div>
+        </div>
+    </section>
+
+    <div class="footer">© <span id="y"></span> LkSG Compass — Demo Marketing Page</div>
+</div>
+
+<script>document.getElementById('y').innerText = new Date().getFullYear();</script>
+</body>
+</html>

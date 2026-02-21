@@ -1,0 +1,31 @@
+:root{--bg:#f6f7f6;--card:#fff;--line:#e6e6e6;--text:#0b0f0c;--muted:#6b7280;--g2:#1B3D2B;--danger:#C0392B;--warn:#B45309;}
+*{box-sizing:border-box}
+body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;background:var(--bg);color:var(--text)}
+a{color:inherit}
+.container{max-width:1100px;margin:0 auto;padding:24px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.row{display:flex;gap:16px;flex-wrap:wrap}
+.btn{background:var(--g2);color:#fff;border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:600}
+.btn.secondary{background:#111827}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
+.input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px}
+.label{font-size:12px;color:var(--muted);font-weight:700;margin:10px 0 6px}
+.badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 10px;font-size:12px;border:1px solid var(--line);background:#fafafa}
+.badge.low{border-color:#bde5c7;color:#125b2c;background:#eefbf2}
+.badge.medium{border-color:#ffe3b5;color:#7a3e00;background:#fff7e8}
+.badge.high{border-color:#ffc5c0;color:#8b1d13;background:#fff0ef}
+.nav{position:sticky;top:0;background:rgba(246,247,246,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);z-index:10}
+.nav .inner{max-width:1100px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-weight:900;letter-spacing:.2px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px;border-top:1px solid var(--line);text-align:left;font-size:14px}
+th{font-size:12px;color:var(--muted);background:#fafafa}
+
+
+.error{background:#fff1f2;border:1px solid #fecdd3;color:#9f1239;border-radius:12px;padding:10px 12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width: 720px){.grid2{grid-template-columns:1fr}}
+
+.notice{padding:12px;border:1px solid #e3e0d8;border-radius:12px;background:#fff}

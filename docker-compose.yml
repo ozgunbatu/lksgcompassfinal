@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    container_name: lksg_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lksg
+      POSTGRES_PASSWORD: lksg
+      POSTGRES_DB: lksg
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./database/init.sql:/docker-entrypoint-initdb.d/00_init.sql:ro
+
+  backend:
+    build: ./backend
+    container_name: lksg_api
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - db
+    ports:
+      - "4000:4000"
+
+  frontend:
+    build: ./frontend
+    container_name: lksg_web
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
