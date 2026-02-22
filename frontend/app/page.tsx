@@ -1,6 +1,8 @@
 "use client";
-
-export default function Landing() {
+import { redirect } from "next/navigation";
+export default function Page() {
+  redirect("/landing.html");
+}export default function Landing() {
   return (
     <div>
       <div className="nav">
