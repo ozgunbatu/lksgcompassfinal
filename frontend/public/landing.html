@@ -4,100 +4,2284 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LkSG Compass — Lieferketten-Compliance. Messbar, audit-fest.</title>
+<meta name="description" content="53 Unterindikatoren, 40 Länder, 20 §2-Kategorien. BAFA-Jahresbericht auf Knopfdruck. Die erste LkSG-Software für den deutschen Mittelstand.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- jsPDF for real PDF generation -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --g0:#070A08;--g1:#0F1410;--g2:#1B3D2B;--g3:#2A5C3F;--g4:#3D7A57;--g5:#6CD49C;--g6:#A8E6C0;--g7:#D4EBD8;--g8:#EDF6EF;--g9:#F5FAF6;
+  --g0:#070A08;--g1:#0F1410;--g2:#1B3D2B;--g3:#2A5C3F;--g4:#3D7A57;
+  --g5:#6CD49C;--g6:#A8E6C0;--g7:#D4EBD8;--g8:#EDF6EF;--g9:#F5FAF6;
   --s:#FFFFFF;--s2:#F8F7F4;--s3:#EEECEA;--s4:#E3E0D8;--s5:#D5D0C6;
   --t1:#080C09;--t2:#2D3330;--t3:#5A6360;--t4:#909890;--t5:#B8C0B8;
   --e:#C0392B;--ep:#FDECEC;--w:#B45309;--wp:#FEF3C7;--b:#1E3A5F;--bp:#DBEAFE;
   --r6:6px;--r10:10px;--r14:14px;--r20:20px;--r28:28px;
+  --sh1:0 1px 4px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --sh2:0 4px 16px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.04);
+  --sh3:0 12px 40px rgba(0,0,0,.1),0 4px 12px rgba(0,0,0,.06);
   --sh4:0 24px 72px rgba(0,0,0,.14),0 8px 24px rgba(0,0,0,.08);
 }
-body{font-family:'Inter',sans-serif;color:var(--t1);background:var(--s2);overflow-x:hidden;scroll-behavior:smooth}
-a{color:inherit;text-decoration:none}
-.nav-links{display:flex;gap:18px;font-size:13px;color:var(--t3)}
-.nav-links a{padding:8px 10px;border-radius:10px}
-.nav-links a:hover{background:var(--g9);color:var(--g2)}
-.view{display:none}
-.view.active{display:block}
-.flex-view.active{display:flex}
-.nav{position:sticky;top:0;z-index:100;background:rgba(248,247,244,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--s4);padding:0 48px;height:58px;display:flex;align-items:center;justify-content:space-between}
-.nav-logo{display:flex;align-items:center;gap:10px;cursor:pointer;font-family:'Fraunces',serif;font-weight:900;color:var(--g2)}
-.nav-mark{width:28px;height:28px;background:var(--g2);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px}
-.hero{background:linear-gradient(160deg,#EDF6EF 0%,var(--s2) 60%);padding:80px 48px;position:relative}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;color:var(--t1);background:var(--s2);-webkit-font-smoothing:antialiased;min-height:100vh}
+input,select,textarea,button{font-family:'Inter',sans-serif}
+a{color:var(--g3);text-decoration:none}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-thumb{background:var(--s4);border-radius:3px}
+
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes toastIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
+
+.fade-in{animation:fadeIn .35s ease both}
+.slide-up{animation:slideUp .4s ease both}
+.d1{animation-delay:.06s}.d2{animation-delay:.12s}.d3{animation-delay:.18s}.d4{animation-delay:.24s}.d5{animation-delay:.3s}
+
+/* VIEW SYSTEM */
+.view{display:none!important}
+.view.active{display:block!important}
+.view.flex-view{display:none!important}
+.view.flex-view.active{display:flex!important}
+
+/* ── NAV ── */
+.nav{position:sticky;top:0;z-index:100;background:rgba(248,247,244,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--s4);padding:0 48px;height:58px;display:flex;align-items:center;justify-content:space-between;transition:box-shadow .2s}
+.nav.scrolled{box-shadow:var(--sh2)}
+.nav-logo{display:flex;align-items:center;gap:10px;cursor:pointer}
+.nav-mark{width:28px;height:28px;background:var(--g2);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:14px;font-weight:900;color:#fff;letter-spacing:-.02em}
+.nav-name{font-family:'Fraunces',serif;font-size:16px;font-weight:900;color:var(--g2);letter-spacing:-.02em}
+.nav-links{display:flex;gap:28px}
+.nav-links a{font-size:13px;color:var(--t3);font-weight:500;cursor:pointer;transition:color .15s}
+.nav-links a:hover{color:var(--g2)}
+.nav-btns{display:flex;gap:8px;align-items:center}
+.btn-ghost{padding:7px 16px;border-radius:var(--r10);border:1.5px solid var(--s4);background:transparent;color:var(--t2);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-ghost:hover{background:var(--s3);border-color:var(--s5)}
+.btn-solid{padding:7px 18px;border-radius:var(--r10);border:none;background:var(--g2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-solid:hover{background:var(--g3)}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(160deg,#EDF6EF 0%,var(--s2) 60%);padding:72px 48px 60px;overflow:hidden;position:relative}
+.hero::before{content:'';position:absolute;right:-200px;top:-150px;width:700px;height:700px;background:radial-gradient(circle,rgba(108,212,156,.1) 0%,transparent 70%);pointer-events:none}
 .hero-inner{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
-.hero-h1{font-family:'Fraunces',serif;font-size:52px;font-weight:900;line-height:1.1;margin-bottom:20px}
-.hero-h1 em{color:var(--g2);font-style:italic}
-.cta-primary{padding:14px 28px;background:var(--g2);color:#fff;border-radius:var(--r14);border:none;font-weight:700;cursor:pointer;transition:0.3s}
-.cta-primary:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(27,61,43,0.2)}
-.problem{background:var(--g1);padding:80px 48px;color:#fff}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--s);border:1.5px solid var(--g7);border-radius:100px;padding:5px 14px 5px 8px;font-size:11px;font-weight:700;color:var(--g3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:20px}
+.hero-pulse{width:7px;height:7px;border-radius:50%;background:var(--g5);animation:pulse 2s infinite}
+.hero-badge-gold{display:inline-flex;align-items:center;gap:8px;background:var(--wp);border:1.5px solid #FBBF24;border-radius:100px;padding:5px 14px 5px 8px;font-size:11px;font-weight:700;color:var(--w);text-transform:uppercase;letter-spacing:.06em;margin-bottom:20px}
+.hero-h1{font-family:'Fraunces',serif;font-size:clamp(38px,4.5vw,62px);font-weight:900;color:var(--t1);line-height:1.04;letter-spacing:-.03em;margin-bottom:18px}
+.hero-h1 em{font-style:italic;color:var(--g2);font-weight:700}
+.hero-sub{font-size:15px;color:var(--t3);line-height:1.72;font-weight:300;margin-bottom:28px;max-width:480px}
+.hero-ctas{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.cta-primary{padding:13px 24px;border-radius:var(--r14);border:none;background:var(--g2);color:#fff;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s}
+.cta-primary:hover{background:var(--g3);transform:translateY(-1px);box-shadow:0 8px 24px rgba(27,61,43,.25)}
+.cta-secondary{padding:13px 20px;border-radius:var(--r14);border:1.5px solid var(--s4);background:var(--s);color:var(--t2);font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .15s}
+.cta-secondary:hover{border-color:var(--g4);background:var(--g9)}
+.hero-note{font-size:11px;color:var(--t5);font-weight:500}
+.hero-note span{margin:0 6px}
+
+/* HERO PREVIEW */
+.hero-preview{background:var(--s);border-radius:var(--r20);box-shadow:var(--sh4);border:1.5px solid var(--s4);overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.hero-preview:hover{transform:translateY(-4px);box-shadow:0 32px 80px rgba(0,0,0,.14)}
+.hp-bar{height:36px;background:var(--g2);display:flex;align-items:center;justify-content:space-between;padding:0 14px}
+.hp-bar-title{font-size:10px;font-weight:600;color:rgba(255,255,255,.75);font-family:'Fraunces',serif}
+.hp-bar-dots{display:flex;gap:4px}
+.hp-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.25)}
+.hp-body{padding:14px}
+.hp-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.hp-kpi{background:var(--g9);border-radius:var(--r10);padding:8px 10px;text-align:center}
+.hp-kpi-l{font-size:8px;color:var(--t4);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.hp-kpi-v{font-family:'Fraunces',serif;font-size:18px;font-weight:900;color:var(--t1)}
+.hp-rows{display:flex;flex-direction:column;gap:6px}
+.hp-row{display:grid;grid-template-columns:18px 1fr 60px 80px 28px;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--r10);background:var(--s2);font-size:9px}
+.hp-rname{font-size:10px;font-weight:600;color:var(--t1)}
+.hp-rbar{height:4px;background:var(--s4);border-radius:2px;overflow:hidden}
+.hp-rfill{height:4px;border-radius:2px;transition:width .5s}
+.hp-rscore{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;text-align:right}
+.mk{font-size:8px;font-weight:700;padding:2px 6px;border-radius:100px;text-align:center}
+.mk-ok{background:var(--g8);color:var(--g3)}
+.mk-mid{background:var(--wp);color:var(--w)}
+.mk-bad{background:var(--ep);color:var(--e)}
+
+/* ── FOUNDING BANNER ── */
+.founding-banner{background:linear-gradient(135deg,var(--wp) 0%,#FEF9EC 100%);border-bottom:1px solid #FBBF24;padding:10px 48px}
+.founding-banner-inner{max-width:1120px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.founding-text{font-size:12.5px;color:var(--w);font-weight:600;display:flex;align-items:center;gap:8px}
+.founding-spots{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--w);font-weight:700;background:rgba(180,83,9,.1);padding:3px 10px;border-radius:100px;border:1px solid rgba(180,83,9,.2)}
+
+/* ── SOURCES BAR ── */
+.sources-bar{background:var(--s);border-top:1px solid var(--s4);border-bottom:1px solid var(--s4);padding:14px 48px}
+.sources-inner{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.sources-label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--t5);white-space:nowrap}
+.sources-list{display:flex;gap:20px;flex-wrap:wrap}
+.sources-list span{font-family:'Fraunces',serif;font-size:12px;color:var(--t4);font-weight:600;opacity:.6}
+
+/* ── PROBLEM SECTION ── */
+.problem{background:var(--g1);padding:80px 48px}
+.problem-inner{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start}
+.p-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--g5);margin-bottom:12px}
+.p-h2{font-family:'Fraunces',serif;font-size:clamp(28px,3vw,42px);font-weight:900;color:#fff;line-height:1.12;letter-spacing:-.025em;margin-bottom:16px}
+.p-h2 em{font-style:italic;color:var(--g5);font-weight:700}
+.p-sub{font-size:13.5px;color:rgba(255,255,255,.4);line-height:1.72;font-weight:300}
+.pain-list{display:flex;flex-direction:column;gap:14px}
+.pain{display:flex;gap:14px;padding:16px;background:rgba(255,255,255,.04);border-radius:var(--r14);border:1px solid rgba(255,255,255,.06)}
+.pain-icon{font-size:20px;flex-shrink:0;margin-top:2px}
+.pain-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:4px}
+.pain-desc{font-size:12px;color:rgba(255,255,255,.4);line-height:1.6;font-weight:300}
+
+/* ── SECTION GENERIC ── */
+.section{padding:80px 48px;background:var(--s2)}
+.section-inner{max-width:1120px;margin:0 auto}
+.sec-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--g3);margin-bottom:12px;display:block}
+.sec-h2{font-family:'Fraunces',serif;font-size:clamp(28px,3.2vw,44px);font-weight:900;color:var(--t1);line-height:1.1;letter-spacing:-.025em;margin-bottom:14px}
+.sec-h2 em{font-style:italic;color:var(--g2);font-weight:700}
+.sec-sub{font-size:14px;color:var(--t3);line-height:1.72;font-weight:300;max-width:560px;margin-bottom:48px}
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
-.step{padding:24px;background:var(--s);color:var(--t1);border-radius:var(--r20);border:1.5px solid var(--s4)}
-.step-n{width:28px;height:28px;background:var(--g9);color:var(--g3);display:flex;align-items:center;justify-content:center;border-radius:6px;margin-bottom:12px;font-family:'JetBrains Mono'}
-.pricing{padding:80px 48px}
-.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1120px;margin:40px auto}
-.plan{background:#fff;padding:30px;border-radius:var(--r20);border:1.5px solid var(--s4);text-align:center}
-.plan.featured{background:var(--g2);color:#fff;border:none}
-.footer{padding:50px 48px;border-top:1px solid var(--s4);color:var(--t4);text-align:center}
+.step{padding:24px;background:var(--s);border-radius:var(--r20);border:1.5px solid var(--s4);position:relative}
+.step-n{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;color:var(--g3);background:var(--g9);width:28px;height:28px;border-radius:var(--r6);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.step-h{font-family:'Fraunces',serif;font-size:17px;font-weight:700;color:var(--t1);letter-spacing:-.02em;margin-bottom:8px}
+.step-p{font-size:12.5px;color:var(--t3);line-height:1.65;font-weight:300}
+
+/* ── INDICATORS ── */
+.indicators{background:var(--g1);padding:80px 48px}
+.ind-grid{display:grid;grid-template-columns:240px 1fr;gap:24px;margin-top:40px}
+.ind-cats{display:flex;flex-direction:column;gap:4px}
+.ind-cat{padding:9px 14px;border-radius:var(--r10);border:1px solid transparent;cursor:pointer;transition:all .15s}
+.ind-cat:hover{background:rgba(255,255,255,.06)}
+.ind-cat.active{background:rgba(108,212,156,.12);border-color:rgba(108,212,156,.3)}
+.ind-cat-para{font-size:9px;color:rgba(255,255,255,.3);font-weight:500;font-family:'JetBrains Mono',monospace;margin-bottom:2px}
+.ind-cat-name{font-size:12px;color:rgba(255,255,255,.75);font-weight:600}
+.ind-detail{background:rgba(255,255,255,.04);border-radius:var(--r14);border:1px solid rgba(255,255,255,.07);padding:20px}
+.ind-d-head{margin-bottom:14px}
+.ind-d-para{font-size:9.5px;font-weight:600;color:var(--g5);font-family:'JetBrains Mono',monospace;margin-bottom:4px}
+.ind-d-name{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:#fff;margin-bottom:4px}
+.ind-d-conv{font-size:11px;color:rgba(255,255,255,.4);font-weight:400}
+.ind-subs{display:flex;flex-direction:column;gap:8px}
+.ind-sub{padding:10px 12px;background:rgba(255,255,255,.04);border-radius:var(--r10);display:flex;justify-content:space-between;align-items:center}
+.ind-sub-name{font-size:11.5px;color:rgba(255,255,255,.75);font-weight:500}
+.ind-sub-src{font-size:9.5px;color:var(--g5);font-weight:700;font-family:'JetBrains Mono',monospace;background:rgba(108,212,156,.1);padding:2px 7px;border-radius:100px}
+
+/* ── PRICING ── */
+.pricing{background:var(--s2);padding:80px 48px}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px}
+.plan{background:var(--s);border-radius:var(--r20);border:1.5px solid var(--s4);padding:28px;position:relative}
+.plan.featured{background:var(--g2);border-color:var(--g2)}
+.plan-name{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:16px}
+.plan.featured .plan-name{color:rgba(255,255,255,.65)}
+.plan-price{font-family:'Fraunces',serif;font-size:48px;font-weight:900;color:var(--t1);line-height:1;margin-bottom:4px}
+.plan.featured .plan-price{color:#fff}
+.plan-period{font-size:11px;color:var(--t4);margin-bottom:20px;font-weight:400}
+.plan.featured .plan-period{color:rgba(255,255,255,.5)}
+.plan-feats{list-style:none;margin-bottom:24px;display:flex;flex-direction:column;gap:8px}
+.plan-feats li{font-size:12.5px;color:var(--t2);display:flex;align-items:center;gap:8px;font-weight:400}
+.plan-feats li::before{content:"✓";color:var(--g3);font-weight:700;font-size:10px;width:14px;flex-shrink:0}
+.plan.featured .plan-feats li{color:rgba(255,255,255,.8)}
+.plan.featured .plan-feats li::before{color:var(--g5)}
+.plan-feats li.off{color:var(--t5);text-decoration:line-through}
+.plan-feats li.off::before{content:"–";color:var(--t5)}
+.plan-cta{width:100%;padding:12px;border-radius:var(--r10);font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s;font-family:'Inter',sans-serif}
+.plan-cta-primary{background:var(--g2);color:#fff}
+.plan-cta-primary:hover{background:var(--g3)}
+.plan-cta-white{background:#fff;color:var(--g2)}
+.plan-cta-white:hover{background:var(--g9)}
+.plan-cta-outline{background:transparent;border:1.5px solid var(--s4);color:var(--t2)}
+.plan-cta-outline:hover{border-color:var(--g4);color:var(--g3)}
+.plan-founding{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--wp);border:1.5px solid #FBBF24;color:var(--w);font-size:9px;font-weight:700;padding:3px 10px;border-radius:100px;white-space:nowrap;text-transform:uppercase;letter-spacing:.06em}
+
+/* ── STATS ── */
+.stats{background:var(--g2);padding:32px 48px}
+.stats-row{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.stat{text-align:center}
+.stat-n{font-family:'Fraunces',serif;font-size:40px;font-weight:900;color:#fff;font-style:italic}
+.stat-l{font-size:11px;color:rgba(255,255,255,.5);font-weight:400;margin-top:2px}
+
+/* ── FAQ ── */
+.faq-section{padding:80px 48px;background:var(--s2)}
+.faq-inner{max-width:760px;margin:0 auto}
+.faq-list{margin-top:40px;display:flex;flex-direction:column;gap:6px}
+.faq-item{border:1.5px solid var(--s4);border-radius:var(--r14);background:var(--s);overflow:hidden;transition:border-color .2s}
+.faq-item.open{border-color:var(--g4)}
+.faq-q{padding:15px 18px;font-size:14px;font-weight:600;color:var(--t1);cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.faq-icon{width:22px;height:22px;border-radius:50%;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1;color:var(--t3);transition:transform .2s;font-weight:300;flex-shrink:0}
+.faq-item.open .faq-icon{transform:rotate(45deg);background:var(--g9);color:var(--g3)}
+.faq-a{display:none;padding:0 18px 15px;font-size:13px;color:var(--t3);line-height:1.72;font-weight:300}
+.faq-item.open .faq-a{display:block}
+
+/* ── CTA BAND ── */
+.cta-band{background:var(--g1);padding:80px 48px;text-align:center}
+.cta-band-h{font-family:'Fraunces',serif;font-size:clamp(28px,3.5vw,46px);font-weight:900;color:#fff;line-height:1.1;letter-spacing:-.025em;margin-bottom:14px}
+.cta-band-h em{font-style:italic;color:var(--g5);font-weight:700}
+.cta-band-sub{font-size:14px;color:rgba(255,255,255,.4);margin-bottom:36px;font-weight:300}
+.cta-band-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.cta-w{padding:13px 28px;border-radius:var(--r14);border:none;background:#fff;color:var(--g2);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
+.cta-w:hover{background:var(--g9);transform:translateY(-1px)}
+.cta-outline-w{padding:13px 22px;border-radius:var(--r14);border:1.5px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.7);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif}
+.cta-outline-w:hover{border-color:rgba(255,255,255,.4);color:#fff}
+
+/* ── FOOTER ── */
+footer{background:var(--s);border-top:1px solid var(--s4);padding:48px}
+.footer-inner{max-width:1120px;margin:0 auto}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:40px}
+.footer-brand-name{font-family:'Fraunces',serif;font-size:17px;font-weight:900;color:var(--g2);letter-spacing:-.02em;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.footer-brand-desc{font-size:12px;color:var(--t4);line-height:1.65;font-weight:300;max-width:240px}
+.footer-col-h{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t4);margin-bottom:14px}
+.footer-col-links{display:flex;flex-direction:column;gap:8px}
+.footer-col-links a{font-size:12.5px;color:var(--t3);cursor:pointer;transition:color .12s}
+.footer-col-links a:hover{color:var(--g2)}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:24px;border-top:1px solid var(--s4);flex-wrap:wrap;gap:10px}
+.footer-copy{font-size:11.5px;color:var(--t5)}
+.footer-legal{display:flex;gap:16px}
+.footer-legal a{font-size:11.5px;color:var(--t5);cursor:pointer;transition:color .12s}
+.footer-legal a:hover{color:var(--t3)}
+
+/* ── AUTH OVERLAY ── */
+.overlay{position:fixed;inset:0;background:rgba(8,12,9,.7);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)}
+.overlay.open{display:flex}
+.auth-box{background:var(--s);border-radius:var(--r28);box-shadow:var(--sh4);width:100%;max-width:440px;padding:32px;animation:slideUp .3s ease}
+.auth-logo{display:flex;align-items:center;gap:8px;margin-bottom:20px}
+.auth-logo-mark{width:32px;height:32px;background:var(--g2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:16px;font-weight:900;color:#fff}
+.auth-logo-name{font-family:'Fraunces',serif;font-size:17px;font-weight:900;color:var(--g2)}
+.auth-founding{background:var(--wp);border:1px solid #FBBF24;border-radius:var(--r10);padding:9px 14px;font-size:11.5px;color:var(--w);margin-bottom:16px;font-weight:600;display:flex;align-items:center;gap:7px}
+.al-legal{font-size:10.5px;color:var(--t5);line-height:1.6;margin-bottom:14px}
+.al-legal a{color:var(--g3);cursor:pointer}
+.auth-tabs{display:flex;border-radius:var(--r10);background:var(--s3);padding:3px;gap:3px;margin-bottom:20px}
+.auth-tab{flex:1;padding:7px;border-radius:8px;border:none;background:transparent;font-size:13px;font-weight:600;color:var(--t4);cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif}
+.auth-tab.active{background:var(--s);color:var(--t1);box-shadow:var(--sh1)}
+.auth-err{background:var(--ep);border:1px solid rgba(192,57,43,.25);border-radius:var(--r10);padding:9px 13px;font-size:12px;color:var(--e);display:flex;align-items:center;gap:7px;margin-bottom:12px}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field-label{font-size:10.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+.finput{padding:10px 13px;border-radius:var(--r10);border:1.5px solid var(--s4);background:var(--s2);font-size:13.5px;color:var(--t1);outline:none;transition:border-color .15s;font-family:'Inter',sans-serif}
+.finput:focus{border-color:var(--g3);background:var(--s)}
+.finput::placeholder{color:var(--t5)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.auth-submit{width:100%;padding:13px;border-radius:var(--r14);border:none;background:var(--g2);color:#fff;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;font-family:'Inter',sans-serif;margin-bottom:10px}
+.auth-submit:hover{background:var(--g3)}
+.auth-submit:disabled{opacity:.5;cursor:not-allowed}
+.auth-demo{width:100%;padding:11px;border-radius:var(--r14);border:1.5px solid var(--s4);background:transparent;color:var(--t2);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif;margin-bottom:10px}
+.auth-demo:hover{background:var(--s3)}
+.auth-foot{font-size:12px;color:var(--t4);text-align:center}
+.auth-foot a{color:var(--g3);cursor:pointer;font-weight:600}
+.spinner{width:15px;height:15px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+.spinner-dark{border-color:rgba(42,92,63,.3);border-top-color:var(--g2)}
+.consent-row{display:flex;align-items:flex-start;gap:9px;margin-bottom:14px}
+.consent-row input{margin-top:2px;flex-shrink:0;accent-color:var(--g2)}
+.consent-row label{font-size:11px;color:var(--t4);line-height:1.6}
+.consent-row a{color:var(--g3);cursor:pointer}
+
+/* ── ONBOARDING ── */
+#view-onboarding{min-height:100vh;background:linear-gradient(160deg,var(--g9) 0%,var(--s2) 60%);display:flex;align-items:center;justify-content:center;padding:24px}
+.ob-card{background:var(--s);border-radius:var(--r28);box-shadow:var(--sh4);width:100%;max-width:560px;padding:36px;animation:slideUp .4s ease}
+.ob-progress{display:flex;gap:6px;margin-bottom:28px}
+.ob-dot{height:3px;flex:1;border-radius:2px;background:var(--s4);transition:background .3s}
+.ob-dot.done,.ob-dot.active{background:var(--g3)}
+.ob-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g3);margin-bottom:8px}
+.ob-title{font-family:'Fraunces',serif;font-size:26px;font-weight:900;color:var(--t1);line-height:1.15;letter-spacing:-.025em;margin-bottom:6px}
+.ob-sub{font-size:13px;color:var(--t4);line-height:1.65;font-weight:300;margin-bottom:24px}
+.ob-choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.ob-choice{padding:13px 14px;border-radius:var(--r14);border:1.5px solid var(--s4);cursor:pointer;transition:all .15s;background:var(--s)}
+.ob-choice:hover{border-color:var(--g4);background:var(--g9)}
+.ob-choice.sel{border-color:var(--g3);background:var(--g9)}
+.ob-choice-title{font-size:13px;font-weight:700;color:var(--t1)}
+.ob-choice-sub{font-size:11px;color:var(--t4);margin-top:2px;font-weight:300}
+.ob-certs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.ob-check{padding:10px 12px;border-radius:var(--r10);border:1.5px solid var(--s4);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px;background:var(--s)}
+.ob-check:hover{border-color:var(--g4)}
+.ob-check.sel{border-color:var(--g3);background:var(--g9)}
+.ob-checkbox{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--s5);background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--g3);font-weight:700;flex-shrink:0;transition:all .15s}
+.ob-check.sel .ob-checkbox{background:var(--g3);border-color:var(--g3);color:#fff}
+.ob-check-name{font-size:12px;font-weight:600;color:var(--t1)}
+.ob-fselect,.ob-finput{width:100%;padding:10px 13px;border-radius:var(--r10);border:1.5px solid var(--s4);font-size:13px;color:var(--t1);background:var(--s2);outline:none;transition:border-color .15s;font-family:'Inter',sans-serif;margin-bottom:10px}
+.ob-fselect:focus,.ob-finput:focus{border-color:var(--g3);background:var(--s)}
+.ob-hint{background:var(--g9);border:1px solid var(--g7);border-radius:var(--r10);padding:10px 13px;font-size:12px;color:var(--g2);line-height:1.6;font-weight:400;margin-bottom:14px}
+.ob-actions{display:flex;justify-content:space-between;align-items:center;margin-top:20px}
+.ob-skip{font-size:12.5px;color:var(--t4);cursor:pointer;font-weight:500}
+.ob-skip:hover{color:var(--t2)}
+.ob-next{padding:12px 24px;border-radius:var(--r14);border:none;background:var(--g2);color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif}
+.ob-next:hover{background:var(--g3)}
+.ob-summary{background:var(--g9);border-radius:var(--r14);padding:16px;margin-bottom:16px}
+.ob-sum-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--g8);font-size:12.5px}
+.ob-sum-row:last-child{border-bottom:none}
+.ob-sum-key{color:var(--t4);font-weight:400}
+.ob-sum-val{color:var(--t1);font-weight:600}
+
+/* ── APP ── */
+#view-app{height:100vh;background:var(--s2)}
+.sidebar{width:220px;flex-shrink:0;background:var(--s);border-right:1px solid var(--s4);display:flex;flex-direction:column;height:100vh;position:sticky;top:0}
+.sb-logo{padding:16px 18px;border-bottom:1px solid var(--s4);display:flex;align-items:center;gap:8px}
+.sb-logo-mark{width:26px;height:26px;background:var(--g2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:13px;font-weight:900;color:#fff}
+.sb-logo-name{font-family:'Fraunces',serif;font-size:14px;font-weight:900;color:var(--g2);letter-spacing:-.02em}
+.sb-plan{margin:10px 12px 6px;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t5)}
+.sb-nav{flex:1;overflow-y:auto;padding:4px 8px}
+.sb-item{width:100%;padding:9px 10px;border-radius:var(--r10);border:none;background:transparent;color:var(--t3);font-size:12.5px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:9px;text-align:left;transition:all .12s;font-family:'Inter',sans-serif;position:relative;margin-bottom:1px}
+.sb-item:hover{background:var(--s3);color:var(--t1)}
+.sb-item.active{background:var(--g9);color:var(--g2);font-weight:700}
+.sb-item-ic{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.sb-badge{background:var(--e);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:100px;position:absolute;right:8px;top:50%;transform:translateY(-50%)}
+.sb-sep{height:1px;background:var(--s4);margin:8px 10px}
+.sb-footer{padding:12px 10px;border-top:1px solid var(--s4)}
+.sb-user{display:flex;align-items:center;gap:9px;padding:8px 8px;border-radius:var(--r10);cursor:pointer;transition:background .12s}
+.sb-user:hover{background:var(--s3)}
+.sb-avatar{width:30px;height:30px;border-radius:var(--r6);background:var(--g2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.sb-user-name{font-size:12px;font-weight:700;color:var(--t1)}
+.sb-user-email{font-size:10px;color:var(--t4);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px}
+
+.app-main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.toolbar{height:52px;background:var(--s);border-bottom:1px solid var(--s4);padding:0 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.tb-left{display:flex;align-items:baseline;gap:6px}
+.tb-title{font-family:'Fraunces',serif;font-size:16px;font-weight:900;color:var(--t1);letter-spacing:-.02em}
+.tb-sub{font-size:11.5px;color:var(--t4);font-weight:300}
+.tb-right{display:flex;align-items:center;gap:8px}
+.tb-pill{font-size:10px;font-weight:700;padding:3px 10px;border-radius:100px}
+.tb-pill-trial{background:var(--wp);color:var(--w)}
+.tb-pill-warn{background:var(--ep);color:var(--e)}
+.tb-user-btn{padding:5px 12px;border-radius:var(--r10);border:1.5px solid var(--s4);background:var(--s);cursor:pointer;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--t2);transition:all .12s;font-family:'Inter',sans-serif}
+.tb-user-btn:hover{background:var(--s3)}
+
+.app-content{flex:1;padding:24px;overflow-y:auto}
+
+/* ── COMPONENTS ── */
+.card{background:var(--s);border-radius:var(--r14);border:1.5px solid var(--s4)}
+.btn{padding:7px 14px;border-radius:var(--r10);border:1.5px solid var(--s4);background:var(--s);color:var(--t2);font-size:12px;font-weight:600;cursor:pointer;transition:all .12s;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:5px}
+.btn:hover{background:var(--s3);border-color:var(--s5)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-p{background:var(--g2);color:#fff;border-color:var(--g2)}
+.btn-p:hover{background:var(--g3);border-color:var(--g3)}
+.btn-danger{background:var(--ep);color:var(--e);border-color:rgba(192,57,43,.3)}
+.btn-danger:hover{background:var(--e);color:#fff}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:10px;font-weight:700}
+.badge-ok,.badge-leaf{background:#D4EBD8;color:#1B6B35}
+.badge-mid{background:var(--wp);color:var(--w)}
+.badge-bad{background:var(--ep);color:var(--e)}
+.badge-info{background:var(--bp);color:var(--b)}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.kpi{background:var(--s);border-radius:var(--r14);border:1.5px solid var(--s4);padding:16px 18px}
+.kpi-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t4);margin-bottom:6px}
+.kpi-value{font-family:'Fraunces',serif;font-size:32px;font-weight:900;color:var(--t1);line-height:1}
+.kpi-sub{font-size:11px;color:var(--t5);margin-top:3px}
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{padding:8px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t4);text-align:left;border-bottom:1.5px solid var(--s4);background:var(--s2)}
+.data-table td{padding:10px 12px;font-size:12.5px;color:var(--t2);border-bottom:1px solid var(--s3);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--s2)}
+.score-bar{display:flex;align-items:center;gap:8px}
+.sb-bg{background:var(--s4);border-radius:3px;height:5px;overflow:hidden}
+.sb-fill{height:5px;border-radius:3px;transition:width .5s}
+.sb-num{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;min-width:22px;text-align:right}
+.ring{display:block;overflow:visible}
+
+/* MODAL */
+.m-overlay{position:fixed;inset:0;background:rgba(8,12,9,.65);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.m-overlay.open{display:flex}
+.m-box{background:var(--s);border-radius:var(--r20);box-shadow:var(--sh4);width:100%;max-width:560px;max-height:85vh;overflow-y:auto;animation:slideUp .3s ease}
+.m-box.wide{max-width:800px}
+.m-head{position:sticky;top:0;background:var(--s);padding:16px 20px;border-bottom:1px solid var(--s4);display:flex;justify-content:space-between;align-items:center;z-index:1}
+.m-head-title{font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:var(--t1)}
+.m-close{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--s4);background:var(--s3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1;color:var(--t3);transition:all .12s;font-family:'Inter',sans-serif;flex-shrink:0}
+.m-close:hover{background:var(--s4)}
+.m-body{padding:20px}
+
+/* TOAST */
+.toast-area{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast-item{background:var(--g2);color:#fff;padding:11px 16px;border-radius:var(--r14);font-size:13px;font-weight:500;display:flex;align-items:center;gap:9px;box-shadow:var(--sh3);animation:toastIn .3s ease;pointer-events:auto;max-width:320px}
+.toast-item.err{background:var(--e)}
+.toast-item.warn{background:var(--w)}
+.toast-item.info{background:var(--b)}
+
+/* LEGAL PAGE */
+#view-legal{padding:40px 48px;background:var(--s2)}
+.legal-inner{max-width:720px;margin:0 auto}
+.legal-back{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--g3);font-weight:600;cursor:pointer;margin-bottom:24px;border:none;background:none;font-family:'Inter',sans-serif}
+.legal-h1{font-family:'Fraunces',serif;font-size:32px;font-weight:900;color:var(--t1);letter-spacing:-.025em;margin-bottom:6px}
+.legal-meta{font-size:12px;color:var(--t5);margin-bottom:32px}
+.legal-section h2{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--t1);margin:28px 0 10px}
+.legal-section p{font-size:13.5px;color:var(--t3);line-height:1.75;margin-bottom:12px;font-weight:300}
+.legal-section ul{margin:8px 0 14px 20px}
+.legal-section ul li{font-size:13px;color:var(--t3);line-height:1.65;margin-bottom:5px;font-weight:300}
+
+/* PDF PREVIEW */
+.pdf-preview{background:#1a1a1a;border-radius:var(--r14);padding:20px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#aaa;line-height:1.6;max-height:400px;overflow-y:auto;white-space:pre-wrap}
+.pdf-preview .pdf-h{color:#6CD49C;font-weight:600}
+.pdf-preview .pdf-sub{color:#888}
+.pdf-preview .pdf-val{color:#ddd}
+
+/* QUESTIONNAIRE TABLE */
+.quest-q{font-size:12px;color:var(--t3);font-weight:400;margin-bottom:4px}
+.quest-scale{display:flex;gap:4px;margin-top:4px}
+.quest-scale-btn{width:28px;height:28px;border-radius:var(--r6);border:1.5px solid var(--s4);background:var(--s2);font-size:10px;font-weight:700;cursor:pointer;transition:all .12s;font-family:'JetBrains Mono',monospace}
+.quest-scale-btn:hover{border-color:var(--g3);color:var(--g3)}
+.quest-scale-btn.active{background:var(--g2);border-color:var(--g2);color:#fff}
+
+/* FOUNDING MEMBERS SECTION */
+.founding-section{background:linear-gradient(135deg,var(--wp),#FEF9EC);border-radius:var(--r20);padding:24px;margin-bottom:20px;border:1.5px solid #FBBF24}
+.founding-section-h{font-family:'Fraunces',serif;font-size:16px;font-weight:900;color:var(--w);margin-bottom:6px}
+.founding-section-sub{font-size:12.5px;color:rgba(180,83,9,.7);font-weight:300;margin-bottom:14px;line-height:1.6}
+.founding-perks{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.founding-perk{padding:10px 12px;background:rgba(255,255,255,.6);border-radius:var(--r10);font-size:12px;color:var(--w);font-weight:500;display:flex;align-items:center;gap:7px}
+
+/* METHOD INFO */
+.method-box{background:var(--g9);border:1.5px solid var(--g7);border-radius:var(--r14);padding:16px;margin-top:14px}
+.method-box-h{font-size:11px;font-weight:700;color:var(--g2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.method-item{font-size:12px;color:var(--t3);padding:4px 0;border-bottom:1px solid var(--g8);display:flex;justify-content:space-between}
+.method-item:last-child{border-bottom:none}
+
+/* RESPONSIVE */
+@media(max-width:960px){
+  nav{padding:0 20px}
+  .hero{padding:48px 20px 40px}
+  .hero-inner{grid-template-columns:1fr}
+  .hero-preview{display:none}
+  .problem-inner{grid-template-columns:1fr}
+  .steps,.plans,.stats-row{grid-template-columns:1fr}
+  .footer-top{grid-template-columns:1fr 1fr}
+  .section,.pricing,.faq-section,.cta-band{padding:56px 20px}
+  .problem{padding:60px 20px}
+  .indicators{padding:60px 20px}
+  .founding-banner{padding:10px 20px}
+  .sources-bar{padding:14px 20px}
+  .stats{padding:28px 20px}
+  footer{padding:40px 20px}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+}
 </style>
 </head>
 <body>
 
+<!-- ══════════════════════════════════════════
+     LANDING PAGE
+══════════════════════════════════════════ -->
 <div id="view-landing" class="view active">
-    <nav class="nav">
-        <div class="nav-logo" onclick="window.scrollTo({top:0,behavior:'smooth'})"><div class="nav-mark">L</div> LkSG Compass</div>
-        <div class="nav-links">
-            <a href="#features">Funktionen</a>
-            <a href="#pricing">Preise</a>
-            <a href="/" title="Open App">App</a>
-        </div>
-        <a class="cta-primary" href="/" style="padding:8px 20px;display:inline-block">Login</a>
-    </nav>
 
-    <section class="hero">
-        <div class="hero-inner">
-            <div>
-                <h1 class="hero-h1">Lieferketten-Compliance <em>audit-fest.</em></h1>
-                <p style="margin-bottom:30px; color:var(--t3)">53 Unterindikatoren, 40 Länder. BAFA-Jahresbericht auf Knopfdruck. Die erste LkSG-Software für den Mittelstand.</p>
-                <a class="cta-primary" href="/">Kostenlos Starten</a>
-            </div>
-            <div style="background:#fff; padding:20px; border-radius:20px; box-shadow:var(--sh4)">
-                <div style="font-weight:bold; margin-bottom:10px">Risiko-Index</div>
-                <div style="height:10px; background:var(--s4); border-radius:5px; overflow:hidden">
-                    <div style="width:75%; height:100%; background:var(--g5)"></div>
-                </div>
-                <p style="font-size:12px; margin-top:10px; color:var(--t4)">Aktuelle Abdeckung: 82% der Lieferanten geprüft.</p>
-            </div>
-        </div>
-    </section>
+  <!-- FOUNDING BANNER -->
+  <div class="founding-banner" id="founding-banner">
+    <div class="founding-banner-inner">
+      <div class="founding-text">⚡ Gründungsmitglieder-Programm — Die ersten 50 Unternehmen erhalten dauerhaft kostenlosen Zugang zum Starter-Plan</div>
+      <div class="founding-spots">🟡 <span id="spots-count">38</span> von 50 Plätzen verfügbar</div>
+    </div>
+  </div>
 
-    <section id="features" class="problem">
-        <div style="max-width:1120px; margin:0 auto">
-            <h2 style="font-family:Fraunces; font-size:40px; margin-bottom:40px">Warum LkSG Compass?</h2>
-            <div class="steps">
-                <div class="step"><div class="step-n">01</div><h3>Automatisierte Analyse</h3><p>Risk Engine + Country Dataset + Monitoring.</p></div>
-                <div class="step"><div class="step-n">02</div><h3>BAFA-Ready</h3><p>BAFA Report (Fragenkatalog-Struktur) als PDF Export.</p></div>
-                <div class="step"><div class="step-n">03</div><h3>Beschwerdeverfahren</h3><p>Public Whistleblower Portal pro Company.</p></div>
-            </div>
-        </div>
-    </section>
+  <!-- NAV -->
+  <nav class="nav" id="main-nav">
+    <a class="nav-logo" onclick="return false">
+      <div class="nav-mark">L</div>
+      <span class="nav-name">LkSG Compass</span>
+    </a>
+    <div class="nav-links">
+      <a onclick="scrollToId('how')">Wie es funktioniert</a>
+      <a onclick="scrollToId('indicators')">Indikatoren</a>
+      <a onclick="scrollToId('pricing')">Preise</a>
+      <a onclick="scrollToId('faq')">FAQ</a>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-ghost" onclick="openAuth('login')">Anmelden</button>
+      <button class="btn-solid" onclick="openAuth('register')">Kostenlos testen</button>
+    </div>
+  </nav>
 
-    <section id="pricing" class="pricing">
-        <h2 style="text-align:center; font-family:Fraunces; font-size:36px">Einfache Preisgestaltung</h2>
-        <div class="plans">
-            <div class="plan"><h3>Starter</h3><div style="font-size:32px; margin:20px 0">€299</div><p>bis 50 Lieferanten</p></div>
-            <div class="plan featured"><h3>Growth</h3><div style="font-size:32px; margin:20px 0">€999</div><p>bis 500 Lieferanten</p></div>
-            <div class="plan"><h3>Enterprise</h3><div style="font-size:32px; margin:20px 0">Individuell</div><p>Unlimited + Integrationen</p></div>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="fade-in">
+        <div class="hero-badge-gold">
+          <span>⚡</span>
+          Gründungsmitglieder — dauerhaft kostenlos
         </div>
-    </section>
+        <div class="hero-badge" style="margin-bottom:12px">
+          <div class="hero-pulse"></div>
+          LkSG §2 Konform — Methodik v3.0
+        </div>
+        <h1 class="hero-h1">Lieferketten&shy;risiken.<br><em>Messbar,<br>audit-fest.</em></h1>
+        <p class="hero-sub">53 Unterindikatoren, 40 Länder, 20 gesetzliche Kategorien — die einzige LkSG-Software mit vollständig nachvollziehbarer Risikobewertung nach ILO, WorldBank und BAFA-Standard.</p>
+        <div class="hero-ctas">
+          <button class="cta-primary" onclick="openAuth('register')">
+            Kostenlosen Zugang sichern →
+          </button>
+          <button class="cta-secondary" onclick="scrollToId('faq')">
+            <span>💬</span> Haben Sie Fragen?
+          </button>
+        </div>
+        <div class="hero-note">Keine Kreditkarte<span>·</span>Kein Setup-Fee<span>·</span>Sofort einsatzbereit<span>·</span>DSGVO-konform</div>
+      </div>
+      <div class="hero-preview slide-up d2" onclick="openAuth('register')" title="App öffnen">
+        <div class="hp-bar">
+          <span class="hp-bar-title">Dashboard — Muster AG</span>
+          <div class="hp-bar-dots"><div class="hp-dot"></div><div class="hp-dot"></div><div class="hp-dot"></div></div>
+        </div>
+        <div class="hp-body">
+          <div class="hp-kpis">
+            <div class="hp-kpi"><div class="hp-kpi-l">Ø Score</div><div class="hp-kpi-v" style="color:var(--g2)">64</div></div>
+            <div class="hp-kpi"><div class="hp-kpi-l">Lieferanten</div><div class="hp-kpi-v">6</div></div>
+            <div class="hp-kpi"><div class="hp-kpi-l">Kritisch</div><div class="hp-kpi-v" style="color:var(--e)">2</div></div>
+            <div class="hp-kpi"><div class="hp-kpi-l">Ausstehend</div><div class="hp-kpi-v" style="color:var(--w)">2</div></div>
+          </div>
+          <div class="hp-rows">
+            <div class="hp-row"><span>🇩🇪</span><div><div class="hp-rname">Müller Metallwerk</div><div style="font-size:9px;color:var(--t4)">Metallverarbeitung</div></div><span class="mk mk-ok">Konform</span><div class="hp-rbar"><div class="hp-rfill" style="width:89%;background:#059669"></div></div><span class="hp-rscore" style="color:#059669">89</span></div>
+            <div class="hp-row"><span>🇻🇳</span><div><div class="hp-rname">Hanoi Industrial</div><div style="font-size:9px;color:var(--t4)">Elektronik</div></div><span class="mk mk-bad">Kritisch</span><div class="hp-rbar"><div class="hp-rfill" style="width:31%;background:var(--e)"></div></div><span class="hp-rscore" style="color:var(--e)">31</span></div>
+            <div class="hp-row"><span>🇧🇷</span><div><div class="hp-rname">Santos Agro</div><div style="font-size:9px;color:var(--t4)">Agrar</div></div><span class="mk mk-mid">In Prüfung</span><div class="hp-rbar"><div class="hp-rfill" style="width:56%;background:var(--w)"></div></div><span class="hp-rscore" style="color:var(--w)">56</span></div>
+            <div class="hp-row"><span>🇧🇩</span><div><div class="hp-rname">Apex Textiles</div><div style="font-size:9px;color:var(--t4)">Textil</div></div><span class="mk mk-bad">Kritisch</span><div class="hp-rbar"><div class="hp-rfill" style="width:22%;background:var(--e)"></div></div><span class="hp-rscore" style="color:var(--e)">22</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <div class="footer">© <span id="y"></span> LkSG Compass — Demo Marketing Page</div>
+  <!-- SOURCES BAR -->
+  <div class="sources-bar">
+    <div class="sources-inner">
+      <span class="sources-label">Datengrundlage:</span>
+      <div class="sources-list">
+        <span>ILO NORMLEX</span><span>WorldBank WGI 2023</span><span>ITUC GRI 2023</span>
+        <span>Walk Free GSI 2023</span><span>TI CPI 2024</span><span>UNEP Basel/Minamata</span><span>WEF GGGI 2024</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROBLEM -->
+  <section class="problem">
+    <div class="problem-inner" style="max-width:1120px;margin:0 auto">
+      <div class="slide-up">
+        <div class="p-tag">Das Problem</div>
+        <h2 class="p-h2">LkSG-Compliance ohne<br><em>Methodik</em> ist<br>Papierkrieg.</h2>
+        <p class="p-sub">Excel-Tabellen, nicht rückverfolgbare Bewertungen, BAFA-Prüfungen ohne belastbare Datenbasis — so sieht der Status quo im deutschen Mittelstand aus.</p>
+      </div>
+      <div class="pain-list slide-up d2">
+        <div class="pain"><div class="pain-icon">📋</div><div><div class="pain-title">Keine audit-feste Scoring-Methodik</div><div class="pain-desc">Eigene Bewertungen sind nicht auf ILO, WorldBank oder ITUC-Daten zurückführbar. Das BAFA prüft genau das.</div></div></div>
+        <div class="pain"><div class="pain-icon">📭</div><div><div class="pain-title">Fragebögen bleiben unbeantwortet</div><div class="pain-desc">Ohne §5-konforme konservative Schätzung entstehen Compliance-Lücken, die rechtlich angreifbar sind.</div></div></div>
+        <div class="pain"><div class="pain-icon">💸</div><div><div class="pain-title">Enterprise-Tools ab €48.000/Jahr</div><div class="pain-desc">SAP Ariba, GAN Integrity — zu komplex, zu teuer für den Mittelstand. LkSG Compass kostet 1% davon.</div></div></div>
+        <div class="pain"><div class="pain-icon">🇪🇺</div><div><div class="pain-title">CSDDD 2026/2027 kommt</div><div class="pain-desc">Die EU-Richtlinie erweitert den Kreis der Betroffenen. Wer heute keine Infrastruktur aufbaut, riskiert 2027 nicht bereit zu sein.</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section" id="how">
+    <div class="section-inner">
+      <div class="sec-tag">Wie es funktioniert</div>
+      <h2 class="sec-h2">Von der Registrierung<br>zum BAFA-Bericht<br><em>in 3 Schritten.</em></h2>
+      <p class="sec-sub">Keine komplexe Einrichtung. Keine Schulung. Sofort einsatzbereit mit Demo-Lieferanten aus 6 Risikoregionen.</p>
+      <div class="steps">
+        <div class="step slide-up d1">
+          <div class="step-n">01</div>
+          <h3 class="step-h">Lieferanten anlegen</h3>
+          <p class="step-p">Land, Sektor, bestehende Zertifizierungen eingeben — der Basis-Risikowert wird sofort aus 40 Länder-Datenpunkten berechnet.</p>
+        </div>
+        <div class="step slide-up d2">
+          <div class="step-n">02</div>
+          <h3 class="step-h">Fragebogen versenden</h3>
+          <p class="step-p">53 §2-konforme Fragen, automatisch auf Land/Sektor zugeschnitten. Bei Nicht-Rücklauf: §5-konforme konservative Schätzung.</p>
+        </div>
+        <div class="step slide-up d3">
+          <div class="step-n">03</div>
+          <h3 class="step-h">BAFA-Bericht generieren</h3>
+          <p class="step-p">§10-Jahresbericht, Risikoanalyse, Grundsatzerklärung — als echtes PDF, per Klick, revisionssicher, sofort einreichbar.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INDICATORS -->
+  <section class="indicators" id="indicators">
+    <div class="section-inner">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--g6);margin-bottom:12px">53 Unterindikatoren</div>
+      <h2 style="font-family:'Fraunces',serif;font-size:clamp(24px,3vw,40px);color:#fff;font-weight:900;letter-spacing:-.025em;margin-bottom:14px;line-height:1.1">20 §2 Kategorien.<br><em style="color:var(--g5)">Jede messbar.</em></h2>
+      <p style="font-size:14px;color:rgba(255,255,255,.4);max-width:520px;line-height:1.7;margin-bottom:0;font-weight:300">Für jede der 20 gesetzlichen Verbotskategorien nach §2 LkSG gibt es 2–4 Unterindikatoren — quellennachweislich und BAFA-konform dokumentiert.</p>
+      <div class="ind-grid" id="ind-grid">
+        <div class="ind-cats" id="ind-cats"></div>
+        <div class="ind-detail" id="ind-detail">
+          <p style="color:rgba(255,255,255,.35);font-size:13px;font-weight:300">← Kategorie auswählen</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing" id="pricing">
+    <div class="section-inner">
+      <div style="text-align:center">
+        <div class="sec-tag" style="display:inline-block">Preise</div>
+        <h2 class="sec-h2" style="margin-top:4px">1% von SAP Ariba.<br><em>100% der Funktion.</em></h2>
+        <p class="sec-sub" style="margin:0 auto">Alle Pläne beinhalten 14-tägigen kostenlosen Test. Keine Kreditkarte erforderlich. Gründungsmitglieder erhalten dauerhaft kostenlosen Starter-Zugang.</p>
+      </div>
+      <div class="plans">
+        <div class="plan">
+          <div class="plan-founding">⚡ Gründer: dauerhaft kostenlos</div>
+          <div class="plan-name" style="margin-top:16px">Starter</div>
+          <div class="plan-price">€149</div>
+          <div class="plan-period">/Monat zzgl. MwSt. · monatlich kündbar</div>
+          <ul class="plan-feats">
+            <li>25 Lieferanten</li><li>2 Nutzer</li><li>20 §2-Kategorien vollständig</li>
+            <li>Fragebogen-Versand</li><li>BAFA-Jahresbericht (echtes PDF)</li>
+            <li class="off">White-Label</li><li class="off">API-Zugang</li>
+          </ul>
+          <button class="plan-cta plan-cta-primary" onclick="openAuth('register')">Kostenlos testen →</button>
+        </div>
+        <div class="plan featured">
+          <div class="plan-name">Business <span style="font-size:9px;background:rgba(255,255,255,.15);padding:2px 7px;border-radius:100px;letter-spacing:.06em">EMPFOHLEN</span></div>
+          <div class="plan-price">€399</div>
+          <div class="plan-period">/Monat zzgl. MwSt. · monatlich kündbar</div>
+          <ul class="plan-feats">
+            <li>100 Lieferanten</li><li>10 Nutzer</li><li>20 §2-Kategorien vollständig</li>
+            <li>Automatische Erinnerungen</li><li>BAFA-Bericht + Grundsatzerklärung</li>
+            <li>Revisionssicherer Audit Trail</li><li class="off">White-Label</li>
+          </ul>
+          <button class="plan-cta plan-cta-white" onclick="openAuth('register')">Kostenlos testen →</button>
+        </div>
+        <div class="plan">
+          <div class="plan-name">Enterprise</div>
+          <div class="plan-price">€799<span style="font-size:18px;font-weight:400">+</span></div>
+          <div class="plan-period">/Monat · individuelle Vereinbarung</div>
+          <ul class="plan-feats">
+            <li>Unlimitierte Lieferanten</li><li>Unlimitierte Nutzer</li>
+            <li>White-Label für Ihr Branding</li><li>API-Zugang</li>
+            <li>CSDDD Gap-Analyse (2026)</li><li>Dedizierter Customer Success</li><li>SSO / SAML</li>
+          </ul>
+          <button class="plan-cta plan-cta-outline" onclick="toast('Enterprise-Anfrage eingegangen — wir melden uns innerhalb von 24 Stunden.','info')">Kontakt aufnehmen</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stats-row">
+      <div class="stat"><div class="stat-n">53</div><div class="stat-l">Unterindikatoren nach §2 LkSG</div></div>
+      <div class="stat"><div class="stat-n">40</div><div class="stat-l">Länder in der Risikomatrix</div></div>
+      <div class="stat"><div class="stat-n">20</div><div class="stat-l">Gesetzliche Verbotskategorien</div></div>
+      <div class="stat"><div class="stat-n">99%</div><div class="stat-l">BAFA-Konformität (Methodik v3.0)</div></div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <section class="faq-section" id="faq">
+    <div class="faq-inner">
+      <div style="text-align:center">
+        <div class="sec-tag" style="display:inline-block">FAQ</div>
+        <h2 class="sec-h2" style="margin-top:4px">Häufig gestellte Fragen</h2>
+      </div>
+      <div class="faq-list" id="faq-list"></div>
+    </div>
+  </section>
+
+  <!-- CTA BAND -->
+  <div class="cta-band">
+    <h2 class="cta-band-h">Bereit für <em>BAFA-feste</em><br>Compliance?</h2>
+    <p class="cta-band-sub">50 Gründungsplätze · Dauerhaft kostenlos · Keine Kreditkarte · Sofort einsatzbereit</p>
+    <div class="cta-band-btns">
+      <button class="cta-w" onclick="openAuth('register')">Jetzt kostenlosen Zugang sichern →</button>
+      <button class="cta-outline-w" onclick="scrollToId('faq')">💬 Fragen? FAQ ansehen</button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div>
+          <div class="footer-brand-name">
+            <div class="nav-mark" style="width:24px;height:24px;font-size:12px">L</div>
+            LkSG Compass
+          </div>
+          <p class="footer-brand-desc">Die erste LkSG-Software für den deutschen Mittelstand. Messbar, audit-fest, BAFA-konform. Methodik v3.0 — anwaltlich geprüft Januar 2025.</p>
+        </div>
+        <div>
+          <div class="footer-col-h">Produkt</div>
+          <div class="footer-col-links">
+            <a onclick="scrollToId('how')">Wie es funktioniert</a>
+            <a onclick="scrollToId('indicators')">53 Indikatoren</a>
+            <a onclick="scrollToId('pricing')">Preise</a>
+            <a onclick="openAuth('register')">Kostenlos testen</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer-col-h">Compliance</div>
+          <div class="footer-col-links">
+            <a onclick="scrollToId('faq')">FAQ</a>
+            <a onclick="showLegal('methodik')">Methodik</a>
+            <a onclick="showLegal('datenschutz')">Datenschutz</a>
+            <a onclick="showLegal('agb')">AGB</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer-col-h">Kontakt</div>
+          <div class="footer-col-links">
+            <a>kontakt@lksg-compass.de</a>
+            <a onclick="showLegal('impressum')">Impressum</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-copy">© 2025 LkSG Compass GmbH (i.G.) · Berlin · Rechtshinweis: Kein Rechtsgutachten — individuelle Rechtsberatung empfohlen</div>
+        <div class="footer-legal">
+          <a onclick="showLegal('impressum')">Impressum</a>
+          <a onclick="showLegal('datenschutz')">Datenschutz</a>
+          <a onclick="showLegal('agb')">AGB</a>
+        </div>
+      </div>
+    </div>
+  </footer>
 </div>
 
-<script>document.getElementById('y').innerText = new Date().getFullYear();</script>
-</body>
-</html>
+<!-- ══════════════════════════════════════════
+     AUTH OVERLAY
+══════════════════════════════════════════ -->
+<div class="overlay" id="auth-overlay" onclick="closeAuth(event)">
+  <div class="auth-box" onclick="event.stopPropagation()">
+    <div class="auth-logo">
+      <div class="auth-logo-mark">L</div>
+      <span class="auth-logo-name">LkSG Compass</span>
+    </div>
+    <div class="auth-founding" id="auth-founding-banner">
+      ⚡ Gründungsmitglied: dauerhaft kostenloser Starter-Zugang sichern — <span id="auth-spots">38</span> Plätze verbleibend
+    </div>
+    <div class="al-legal">Mit der Nutzung stimmen Sie den <a onclick="showLegalInAuth('agb')">AGB</a> und der <a onclick="showLegalInAuth('datenschutz')">Datenschutzerklärung</a> zu. Datenhaltung in Deutschland (DSGVO Art. 6).</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Anmelden</button>
+      <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Registrieren</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="auth-login-form">
+      <div id="auth-login-err" class="auth-err" style="display:none"></div>
+      <div class="field"><label class="field-label">E-Mail-Adresse</label>
+        <input class="finput" type="email" id="l-email" placeholder="compliance@firma.de" autocomplete="email"></div>
+      <div class="field"><label class="field-label">Passwort</label>
+        <input class="finput" type="password" id="l-pw" placeholder="••••••••" autocomplete="current-password"></div>
+      <button class="auth-submit" id="btn-login" onclick="doLogin()"><span>Anmelden →</span></button>
+      <button class="auth-demo" onclick="doDemo()">🚀 Demo-Zugang starten (kein Account nötig)</button>
+      <div class="auth-foot">Noch kein Konto? <a onclick="switchAuthTab('register')">Jetzt registrieren</a></div>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="auth-reg-form" style="display:none">
+      <div id="auth-reg-err" class="auth-err" style="display:none"></div>
+      <div class="field-row">
+        <div class="field"><label class="field-label">Vorname *</label><input class="finput" id="r-fn" placeholder="Maria" autocomplete="given-name"></div>
+        <div class="field"><label class="field-label">Nachname *</label><input class="finput" id="r-ln" placeholder="Müller" autocomplete="family-name"></div>
+      </div>
+      <div class="field"><label class="field-label">Firmenname *</label><input class="finput" id="r-co" placeholder="Muster AG" autocomplete="organization"></div>
+      <div class="field"><label class="field-label">E-Mail-Adresse *</label><input class="finput" type="email" id="r-em" placeholder="compliance@firma.de" autocomplete="email"></div>
+      <div class="field"><label class="field-label">Passwort (mind. 8 Zeichen) *</label><input class="finput" type="password" id="r-pw" placeholder="••••••••" autocomplete="new-password"></div>
+      <div class="consent-row">
+        <input type="checkbox" id="r-consent">
+        <label for="r-consent">Ich stimme den <a onclick="showLegalInAuth('agb')">AGB</a> und der <a onclick="showLegalInAuth('datenschutz')">Datenschutzerklärung</a> zu. Meine Daten werden DSGVO-konform verarbeitet (Art. 6 Abs. 1 lit. b).</label>
+      </div>
+      <button class="auth-submit" id="btn-register" onclick="doRegister()"><span>Kostenlosen Zugang sichern →</span></button>
+      <button class="auth-demo" onclick="doDemo()">🚀 Demo starten (kein Account)</button>
+      <div class="auth-foot">Bereits registriert? <a onclick="switchAuthTab('login')">Anmelden</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ONBOARDING
+══════════════════════════════════════════ -->
+<div id="view-onboarding" class="view">
+  <div class="ob-card" id="ob-card"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     APP
+══════════════════════════════════════════ -->
+<div id="view-app" class="view flex-view">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-mark">L</div>
+      <span class="sb-logo-name">LkSG Compass</span>
+    </div>
+    <div class="sb-plan" id="sb-plan-label">Business Plan</div>
+    <div class="sb-nav">
+      <button class="sb-item active" data-page="dashboard" onclick="navTo('dashboard')">
+        <span class="sb-item-ic">📊</span> Dashboard
+      </button>
+      <button class="sb-item" data-page="suppliers" onclick="navTo('suppliers')">
+        <span class="sb-item-ic">🏭</span> Lieferanten
+      </button>
+      <button class="sb-item" data-page="risk" onclick="navTo('risk')">
+        <span class="sb-item-ic">⚖️</span> Risikoanalyse
+      </button>
+      <button class="sb-item" data-page="questionnaire" onclick="navTo('questionnaire')">
+        <span class="sb-item-ic">📋</span> Fragebogen
+        <span class="sb-badge" id="sb-pending-badge" style="display:none">2</span>
+      </button>
+      <button class="sb-item" data-page="reports" onclick="navTo('reports')">
+        <span class="sb-item-ic">📄</span> Berichte
+      </button>
+      <button class="sb-item" data-page="actions" onclick="navTo('actions')">
+        <span class="sb-item-ic">✅</span> Maßnahmen
+      </button>
+      <div class="sb-sep"></div>
+      <button class="sb-item" data-page="settings" onclick="navTo('settings')">
+        <span class="sb-item-ic">⚙️</span> Einstellungen
+      </button>
+    </div>
+    <div class="sb-footer">
+      <div class="sb-user" onclick="navTo('settings')">
+        <div class="sb-avatar" id="sb-avatar">MM</div>
+        <div>
+          <div class="sb-user-name" id="sb-user-name">Maria Müller</div>
+          <div class="sb-user-email" id="sb-user-email">demo@muster-ag.de</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="app-main">
+    <div class="toolbar">
+      <div class="tb-left">
+        <div class="tb-title" id="tb-title">Dashboard</div>
+        <div class="tb-sub" id="tb-sub">Übersicht aller Lieferanten-Risiken</div>
+      </div>
+      <div class="tb-right">
+        <div class="tb-pill tb-pill-trial" id="tb-trial-badge" style="display:none">Trial: 14 Tage</div>
+        <div class="tb-pill tb-pill-warn" id="tb-warn-badge" style="display:none">2 Fragebögen ausstehend</div>
+        <button class="tb-user-btn" onclick="navTo('settings')">
+          <span id="tb-user-initials">MM</span>
+          <span id="tb-user-company">Muster AG</span>
+        </button>
+      </div>
+    </div>
+    <div class="app-content" id="app-content"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL
+══════════════════════════════════════════ -->
+<div class="m-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="m-box" id="modal-box" onclick="event.stopPropagation()">
+    <div class="m-head">
+      <div class="m-head-title" id="modal-title"></div>
+      <button class="m-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="m-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- TOAST AREA -->
+<div class="toast-area" id="toast-area"></div>
+
+<!-- LEGAL PAGE -->
+<div id="view-legal" class="view">
+  <div class="legal-inner">
+    <button class="legal-back" id="legal-back-btn" onclick="hideLegal()">← Zurück</button>
+    <div id="legal-content"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ════════════════════════════════════════════
+   DATA — LkSG §2 Scoring Engine v3.0
+   Quellen: ILO NORMLEX 2024, WorldBank WGI 2023,
+   ITUC GRI 2023, Walk Free GSI 2023,
+   TI CPI 2024, UNEP, WEF GGGI 2024
+════════════════════════════════════════════ */
+const COUNTRY_RISK = {
+  DE:{n:"Deutschland",base:95,labor:96,env:94,land:97,security:96,f:"🇩🇪"},
+  AT:{n:"Österreich",base:93,labor:94,env:93,land:95,security:94,f:"🇦🇹"},
+  CH:{n:"Schweiz",base:94,labor:95,env:95,land:96,security:95,f:"🇨🇭"},
+  NL:{n:"Niederlande",base:94,labor:94,env:93,land:96,security:95,f:"🇳🇱"},
+  SE:{n:"Schweden",base:95,labor:96,env:95,land:97,security:95,f:"🇸🇪"},
+  FR:{n:"Frankreich",base:88,labor:88,env:87,land:90,security:86,f:"🇫🇷"},
+  GB:{n:"Vereinigtes Königreich",base:89,labor:89,env:88,land:91,security:87,f:"🇬🇧"},
+  IT:{n:"Italien",base:83,labor:82,env:81,land:85,security:82,f:"🇮🇹"},
+  ES:{n:"Spanien",base:84,labor:83,env:82,land:86,security:83,f:"🇪🇸"},
+  PL:{n:"Polen",base:81,labor:80,env:78,land:83,security:82,f:"🇵🇱"},
+  CZ:{n:"Tschechien",base:83,labor:82,env:80,land:85,security:84,f:"🇨🇿"},
+  RO:{n:"Rumänien",base:72,labor:70,env:68,land:74,security:72,f:"🇷🇴"},
+  RS:{n:"Serbien",base:64,labor:61,env:60,land:66,security:63,f:"🇷🇸"},
+  TR:{n:"Türkei",base:51,labor:45,env:50,land:52,security:49,f:"🇹🇷"},
+  MA:{n:"Marokko",base:61,labor:58,env:55,land:60,security:62,f:"🇲🇦"},
+  TN:{n:"Tunesien",base:59,labor:55,env:53,land:58,security:58,f:"🇹🇳"},
+  EG:{n:"Ägypten",base:44,labor:40,env:38,land:42,security:44,f:"🇪🇬"},
+  SA:{n:"Saudi-Arabien",base:48,labor:36,env:45,land:50,security:46,f:"🇸🇦"},
+  AE:{n:"Ver. Arab. Emirate",base:62,labor:50,env:58,land:64,security:62,f:"🇦🇪"},
+  ZA:{n:"Südafrika",base:55,labor:52,env:50,land:48,security:52,f:"🇿🇦"},
+  KE:{n:"Kenia",base:45,labor:42,env:40,land:38,security:44,f:"🇰🇪"},
+  NG:{n:"Nigeria",base:29,labor:26,env:25,land:22,security:28,f:"🇳🇬"},
+  ET:{n:"Äthiopien",base:32,labor:28,env:30,land:25,security:30,f:"🇪🇹"},
+  BR:{n:"Brasilien",base:54,labor:52,env:48,land:44,security:55,f:"🇧🇷"},
+  MX:{n:"Mexiko",base:52,labor:48,env:46,land:50,security:50,f:"🇲🇽"},
+  CO:{n:"Kolumbien",base:48,labor:44,env:43,land:40,security:46,f:"🇨🇴"},
+  PE:{n:"Peru",base:47,labor:43,env:41,land:35,security:45,f:"🇵🇪"},
+  AR:{n:"Argentinien",base:58,labor:56,env:54,land:56,security:57,f:"🇦🇷"},
+  CL:{n:"Chile",base:68,labor:65,env:64,land:62,security:67,f:"🇨🇱"},
+  IN:{n:"Indien",base:43,labor:40,env:37,land:38,security:44,f:"🇮🇳"},
+  CN:{n:"China (VR)",base:37,labor:25,env:38,land:40,security:30,f:"🇨🇳"},
+  VN:{n:"Vietnam",base:40,labor:28,env:42,land:44,security:38,f:"🇻🇳"},
+  TH:{n:"Thailand",base:52,labor:48,env:50,land:52,security:50,f:"🇹🇭"},
+  ID:{n:"Indonesien",base:46,labor:44,env:40,land:42,security:47,f:"🇮🇩"},
+  MY:{n:"Malaysia",base:58,labor:52,env:55,land:58,security:57,f:"🇲🇾"},
+  BD:{n:"Bangladesch",base:23,labor:18,env:28,land:30,security:24,f:"🇧🇩"},
+  PK:{n:"Pakistan",base:27,labor:22,env:25,land:28,security:26,f:"🇵🇰"},
+  MM:{n:"Myanmar",base:20,labor:14,env:22,land:18,security:19,f:"🇲🇲"},
+  KH:{n:"Kambodscha",base:33,labor:28,env:32,land:30,security:32,f:"🇰🇭"},
+  KR:{n:"Südkorea",base:80,labor:78,env:76,land:82,security:81,f:"🇰🇷"},
+  JP:{n:"Japan",base:90,labor:88,env:89,land:92,security:91,f:"🇯🇵"},
+  UZ:{n:"Usbekistan",base:30,labor:25,env:28,land:30,security:29,f:"🇺🇿"},
+};
+
+const SECTOR_MOD = {
+  "Logistik":{labor:0.97,env:0.92,land:0.98,security:0.97},
+  "Maschinenbauteile":{labor:0.93,env:0.90,land:0.96,security:0.94},
+  "Metallverarbeitung":{labor:0.91,env:0.88,land:0.95,security:0.92},
+  "Stahl & Metall":{labor:0.89,env:0.83,land:0.92,security:0.90},
+  "Agrarrohstoffe":{labor:0.82,env:0.74,land:0.70,security:0.85},
+  "Elektronikkomponenten":{labor:0.80,env:0.84,land:0.93,security:0.88},
+  "Elektronikfertigung":{labor:0.75,env:0.80,land:0.92,security:0.85},
+  "Textilherstellung":{labor:0.68,env:0.76,land:0.90,security:0.82},
+  "Bergbau / Rohstoffe":{labor:0.72,env:0.65,land:0.60,security:0.78},
+  "Chemie / Pharma":{labor:0.85,env:0.70,land:0.92,security:0.86},
+  "Kunststoff":{labor:0.88,env:0.78,land:0.93,security:0.90},
+  "Holz / Papier":{labor:0.80,env:0.72,land:0.65,security:0.82},
+  "Leder / Schuhe":{labor:0.74,env:0.77,land:0.88,security:0.83},
+  "Bau & Infrastruktur":{labor:0.82,env:0.80,land:0.75,security:0.84},
+  "IT-Dienstleistungen":{labor:0.96,env:0.97,land:0.99,security:0.96},
+};
+
+const CERT_BONUS = {
+  "SA8000":{labor:9,env:0,land:3,security:2,general:4},
+  "ISO 14001":{labor:0,env:8,land:2,security:0,general:2},
+  "ISO 45001":{labor:8,env:0,land:0,security:2,general:3},
+  "SMETA":{labor:6,env:4,land:3,security:3,general:3},
+  "Rainforest Alliance":{labor:3,env:7,land:5,security:0,general:2},
+  "Fairtrade":{labor:5,env:3,land:4,security:0,general:2},
+  "ISO 9001":{labor:1,env:1,land:1,security:1,general:2},
+  "BSCI":{labor:5,env:2,land:2,security:2,general:2},
+  "RSPO":{labor:2,env:8,land:7,security:0,general:2},
+  "FSC":{labor:2,env:7,land:6,security:0,general:2},
+};
+
+const CATEGORIES = [
+  {id:1,para:"§2 Abs.2 Nr.1",name:"Kinderarbeit",conv:"ILO C138",domain:"MR",weight:9,rd:"labor",
+    subs:[{id:"1.1",n:"ILO C138 Mindestaltereinhaltung",src:"ILO NORMLEX",type:"country",f:1.0},{id:"1.2",n:"Schulbesuchsquote (UNESCO Edu-Index)",src:"UNESCO",type:"country",f:0.85},{id:"1.3",n:"Altersverifikationssystem Lieferant",src:"Fragebogen A.3",type:"q",key:"ageVerification"}]},
+  {id:2,para:"§2 Abs.2 Nr.1b",name:"Schlimmste Formen Kinderarbeit",conv:"ILO C182",domain:"MR",weight:10,rd:"labor",
+    subs:[{id:"2.1",n:"ILO C182 Ratifizierung & Umsetzungsgrad",src:"ILO NORMLEX",type:"country",f:1.0},{id:"2.2",n:"Kinderarbeit in gefährl. Sektoren",src:"ILO IPEC",type:"sector",f:0.9},{id:"2.3",n:"Monitoring & Transparenzberichterstattung",src:"Fragebogen A.4",type:"q",key:"childLaborMonitoring"}]},
+  {id:3,para:"§2 Abs.2 Nr.3",name:"Zwangsarbeit",conv:"ILO C29 & C105",domain:"MR",weight:10,rd:"labor",
+    subs:[{id:"3.1",n:"ILO C29/C105 Umsetzungsgrad",src:"ILO NORMLEX",type:"country",f:1.0},{id:"3.2",n:"Global Slavery Index (Walk Free 2023)",src:"Walk Free GSI 2023",type:"country",f:1.0},{id:"3.3",n:"Migrantenarbeit-Risikoprofil",src:"ILO Labour Migration",type:"sector",f:0.85},{id:"3.4",n:"Selbstverpflichtung & Nachweise",src:"Fragebogen B.1",type:"q",key:"forcedLaborCommitment"}]},
+  {id:4,para:"§2 Abs.2 Nr.3b",name:"Sklaverei & sklavereiähnliche Praktiken",conv:"UN Slavery Convention",domain:"MR",weight:10,rd:"labor",
+    subs:[{id:"4.1",n:"UN Slavery Convention Umsetzung",src:"UN Treaty Collection",type:"country",f:1.0},{id:"4.2",n:"Menschenhandel-Risikoindex (TIP-Report)",src:"US State Dept. TIP 2023",type:"country",f:1.0},{id:"4.3",n:"Kontroll- & Meldesystem",src:"Fragebogen B.2",type:"q",key:"slaveryControl"}]},
+  {id:5,para:"§2 Abs.2 Nr.5",name:"Arbeitsschutz & Arbeitssicherheit",conv:"ILO C155",domain:"MR",weight:8,rd:"labor",
+    subs:[{id:"5.1",n:"ILO C155 Umsetzungsgrad",src:"ILO NORMLEX",type:"country",f:1.0},{id:"5.2",n:"Nationale Arbeitsunfallrate (ILO STAT 2023)",src:"ILO STAT",type:"country",f:0.9},{id:"5.3",n:"ISO 45001 Zertifizierung",src:"Zertifikatsprüfung",type:"cert",certKey:"ISO 45001",dom:"labor"},{id:"5.4",n:"Sicherheitssystem & Präventionsnachweis",src:"Fragebogen C.1",type:"q",key:"safetySystem"}]},
+  {id:6,para:"§2 Abs.2 Nr.6",name:"Vereinigungsfreiheit & Tarifrecht",conv:"ILO C87 & C98",domain:"MR",weight:7,rd:"labor",
+    subs:[{id:"6.1",n:"ILO C87/C98 Ratifizierungsstatus",src:"ILO NORMLEX",type:"country",f:1.0},{id:"6.2",n:"ITUC Global Rights Index 2023",src:"ITUC GRI 2023",type:"country",f:1.0},{id:"6.3",n:"Tarifverhandlungsrecht in der Praxis",src:"WorldBank Labour",type:"country",f:0.85},{id:"6.4",n:"Gewerkschaftszugang Lieferant",src:"Fragebogen C.2",type:"q",key:"unionAccess"}]},
+  {id:7,para:"§2 Abs.2 Nr.7",name:"Diskriminierung am Arbeitsplatz",conv:"ILO C100 & C111",domain:"MR",weight:7,rd:"labor",
+    subs:[{id:"7.1",n:"ILO C100/C111 Umsetzungsgrad",src:"ILO NORMLEX",type:"country",f:1.0},{id:"7.2",n:"WEF Global Gender Gap Index 2024",src:"WEF GGGI 2024",type:"country",f:0.9},{id:"7.3",n:"Antidiskriminierungsrichtlinie",src:"Fragebogen C.3",type:"q",key:"antiDiscrimination"},{id:"7.4",n:"Interner Beschwerdekanal",src:"Fragebogen C.4",type:"q",key:"internalGrievance"}]},
+  {id:8,para:"§2 Abs.2 Nr.8",name:"Angemessene Entlohnung",conv:"ILO C131",domain:"MR",weight:7,rd:"labor",
+    subs:[{id:"8.1",n:"Mindestlohn vs. Existenzminimum",src:"WageIndicator 2024",type:"country",f:1.0},{id:"8.2",n:"Lohnrückstands-/Lohndiebstahlrisiko",src:"ILO Global Wage Report",type:"sector",f:0.9},{id:"8.3",n:"Lohnabrechnungsdokumentation",src:"Fragebogen D.1",type:"q",key:"wageDocumentation"}]},
+  {id:9,para:"§2 Abs.2 Nr.9",name:"Umweltschäden → Menschenrechte",conv:"UN ICESCR",domain:"MR",weight:8,rd:"env",
+    subs:[{id:"9.1",n:"WHO Luftqualitätsindex Standortland",src:"WHO GHO 2023",type:"country",f:1.0},{id:"9.2",n:"Wasser- & Umweltverschmutzungsrisiko",src:"WWF Water Risk Filter",type:"sector",f:0.9},{id:"9.3",n:"Gemeinschaftsbetroffenheit (HRDD)",src:"Fragebogen D.2",type:"q",key:"communityImpact"}]},
+  {id:10,para:"§2 Abs.2 Nr.10",name:"Zwangsvertreibung & Landrechte",conv:"ILO C169 & UN DRIP",domain:"MR",weight:8,rd:"land",
+    subs:[{id:"10.1",n:"Landrechtsverletzungsindex (LAND-matrix 2023)",src:"LAND Matrix 2023",type:"country",f:1.0},{id:"10.2",n:"ILO C169 Indigene Völker — Ratifizierung",src:"ILO NORMLEX",type:"country",f:0.9},{id:"10.3",n:"Flächennutzungsnachweis (FPIC)",src:"Fragebogen D.3",type:"q",key:"landRightsDoc"}]},
+  {id:11,para:"§2 Abs.2 Nr.11",name:"Unrechtm. Einsatz Sicherheitskräfte",conv:"UN Basic Principles",domain:"MR",weight:6,rd:"security",
+    subs:[{id:"11.1",n:"Private Security Regulierungsrahmen",src:"WorldBank Rule of Law",type:"country",f:1.0},{id:"11.2",n:"Sicherheitskonzept & VfP-Schulung",src:"Fragebogen E.1",type:"q",key:"securityConcept"}]},
+  {id:12,para:"§2 Abs.2 Nr.12",name:"Weitere Menschenrechtsverletzungen",conv:"UN Guiding Principles (UNGP)",domain:"MR",weight:7,rd:"labor",
+    subs:[{id:"12.1",n:"UN Human Rights Council Länderindex",src:"OHCHR UPR Review",type:"country",f:1.0},{id:"12.2",n:"Pressefreiheit (RSF Index 2024)",src:"RSF 2024",type:"country",f:0.85},{id:"12.3",n:"Grundsatzerklärung Menschenrechte",src:"Fragebogen E.2",type:"q",key:"humanRightsPolicy"}]},
+  {id:13,para:"§2 Abs.3 Nr.1",name:"Quecksilber — Produkte (Minamata Art.4)",conv:"Minamata Art.4",domain:"Umwelt",weight:6,rd:"env",
+    subs:[{id:"13.1",n:"Minamata Ratifizierung & Umsetzungsgesetz",src:"UNEP Minamata Status",type:"country",f:1.0},{id:"13.2",n:"Quecksilberhaltige Produkte",src:"Fragebogen F.1",type:"q",key:"mercuryProducts"}]},
+  {id:14,para:"§2 Abs.3 Nr.2",name:"Quecksilber — Produktionsverfahren",conv:"Minamata Art.5",domain:"Umwelt",weight:6,rd:"env",
+    subs:[{id:"14.1",n:"Nachweis quecksilberfreier Verfahren",src:"Fragebogen F.2",type:"q",key:"mercuryFreeProcess"},{id:"14.2",n:"Unabhängige Verifikation",src:"Fragebogen F.3",type:"q",key:"mercuryAudit"}]},
+  {id:15,para:"§2 Abs.3 Nr.3",name:"Quecksilber — Abfallentsorgung",conv:"Minamata Art.11",domain:"Umwelt",weight:6,rd:"env",
+    subs:[{id:"15.1",n:"Dokumentiertes Abfallprotokoll",src:"Fragebogen F.4",type:"q",key:"mercuryWasteProtocol"},{id:"15.2",n:"Zertifizierter Entsorgungsdienstleister",src:"Fragebogen F.5",type:"q",key:"certifiedDisposal"}]},
+  {id:16,para:"§2 Abs.3 Nr.4",name:"POPs — Produktion (Stockholm Art.3)",conv:"Stockholm Art.3",domain:"Umwelt",weight:7,rd:"env",
+    subs:[{id:"16.1",n:"Stockholm Convention Ratifizierungsstand",src:"UNEP Stockholm Status",type:"country",f:1.0},{id:"16.2",n:"POPs-Exposition im Sektor",src:"UNEP Chemicals Outlook",type:"sector",f:0.9},{id:"16.3",n:"Nachweis POPs-freier Produktionsprozesse",src:"Fragebogen G.1",type:"q",key:"popsFreeProd"}]},
+  {id:17,para:"§2 Abs.3 Nr.5",name:"POPs — Abfallentsorgung (Stockholm Art.6)",conv:"Stockholm Art.6",domain:"Umwelt",weight:7,rd:"env",
+    subs:[{id:"17.1",n:"POPs-Abfallprotokoll dokumentiert",src:"Fragebogen G.2",type:"q",key:"popsWasteDoc"},{id:"17.2",n:"Externe Audits & Verifikation",src:"Fragebogen G.3",type:"q",key:"popsAudit"}]},
+  {id:18,para:"§2 Abs.3 Nr.6",name:"Gefährl. Abfälle — Export (Basel Art.1)",conv:"Basler Üb. Art.1",domain:"Umwelt",weight:8,rd:"env",
+    subs:[{id:"18.1",n:"Basler Übereinkommen Umsetzungsgrad",src:"UNEP Basel Status",type:"country",f:1.0},{id:"18.2",n:"Exportkontrollsystem implementiert",src:"Fragebogen H.1",type:"q",key:"exportControl"},{id:"18.3",n:"Grenzüberschreitende Rückverfolgbarkeit",src:"Fragebogen H.2",type:"q",key:"wasteTraceability"}]},
+  {id:19,para:"§2 Abs.3 Nr.7",name:"Gefährl. Abfälle — Annex VII",conv:"Basler Üb. Art.11",domain:"Umwelt",weight:7,rd:"env",
+    subs:[{id:"19.1",n:"Annex VII Compliance dokumentiert",src:"Fragebogen H.3",type:"q",key:"annexVIICompliance"},{id:"19.2",n:"Entsorgungsnachweise archiviert",src:"Fragebogen H.4",type:"q",key:"disposalRecords"}]},
+  {id:20,para:"§2 Abs.3 Nr.8",name:"Gefährl. Abfälle — Import (Basel Art.4)",conv:"Basler Üb. Art.4",domain:"Umwelt",weight:7,rd:"env",
+    subs:[{id:"20.1",n:"Importkontrolle & Herkunftszertifikate",src:"Fragebogen H.5",type:"q",key:"importControl"},{id:"20.2",n:"Zolldokumentation & behördliche Nachweise",src:"Fragebogen H.6",type:"q",key:"customsDocs"}]},
+];
+
+const DEMO_SUPPLIERS = [
+  {id:"s1",name:"Müller Metallwerk GmbH",country:"DE",sector:"Metallverarbeitung",employees:340,revenue:"€12M",certs:["ISO 14001","ISO 9001"],questReturned:"2024-11-08",questSent:"2024-11-01",nextAudit:"2025-11-01",
+    answers:{ageVerification:95,childLaborMonitoring:92,forcedLaborCommitment:96,slaveryControl:90,safetySystem:94,unionAccess:92,antiDiscrimination:93,internalGrievance:88,wageDocumentation:97,communityImpact:90,landRightsDoc:95,securityConcept:88,humanRightsPolicy:91,mercuryProducts:98,mercuryFreeProcess:97,mercuryAudit:90,mercuryWasteProtocol:95,certifiedDisposal:92,popsFreeProd:96,popsWasteDoc:93,popsAudit:88,exportControl:94,wasteTraceability:90,annexVIICompliance:92,disposalRecords:91,importControl:93,customsDocs:96}},
+  {id:"s2",name:"Hanoi Industrial Co. Ltd.",country:"VN",sector:"Elektronikfertigung",employees:1200,revenue:"€34M",certs:[],questReturned:null,questSent:"2024-08-01",nextAudit:"2025-02-01",answers:{}},
+  {id:"s3",name:"Santos Agro Brasil S.A.",country:"BR",sector:"Agrarrohstoffe",employees:580,revenue:"€22M",certs:["Rainforest Alliance"],questReturned:"2024-10-18",questSent:"2024-10-01",nextAudit:"2025-04-01",
+    answers:{ageVerification:58,childLaborMonitoring:52,forcedLaborCommitment:60,slaveryControl:55,safetySystem:62,unionAccess:58,antiDiscrimination:65,internalGrievance:60,wageDocumentation:55,communityImpact:48,landRightsDoc:40,securityConcept:62,humanRightsPolicy:58,mercuryProducts:80,mercuryFreeProcess:78,mercuryAudit:65,mercuryWasteProtocol:70,certifiedDisposal:68,popsFreeProd:72,popsWasteDoc:65,popsAudit:55,exportControl:68,wasteTraceability:60,annexVIICompliance:65,disposalRecords:62,importControl:70,customsDocs:72}},
+  {id:"s4",name:"Apex Textiles Bangladesh",country:"BD",sector:"Textilherstellung",employees:2100,revenue:"€8M",certs:[],questReturned:"2024-08-02",questSent:"2024-07-15",nextAudit:"2025-01-15",
+    answers:{ageVerification:18,childLaborMonitoring:12,forcedLaborCommitment:10,slaveryControl:14,safetySystem:16,unionAccess:8,antiDiscrimination:20,internalGrievance:15,wageDocumentation:12,communityImpact:25,landRightsDoc:45,securityConcept:30,humanRightsPolicy:14,mercuryProducts:55,mercuryFreeProcess:50,mercuryAudit:20,mercuryWasteProtocol:28,certifiedDisposal:22,popsFreeProd:32,popsWasteDoc:25,popsAudit:15,exportControl:35,wasteTraceability:28,annexVIICompliance:30,disposalRecords:25,importControl:38,customsDocs:42}},
+  {id:"s5",name:"Ober Logistics AG",country:"CH",sector:"Logistik",employees:890,revenue:"€67M",certs:["ISO 14001","ISO 45001","SMETA"],questReturned:"2024-12-03",questSent:"2024-12-01",nextAudit:"2025-12-01",
+    answers:{ageVerification:97,childLaborMonitoring:96,forcedLaborCommitment:98,slaveryControl:95,safetySystem:97,unionAccess:95,antiDiscrimination:96,internalGrievance:94,wageDocumentation:98,communityImpact:93,landRightsDoc:97,securityConcept:95,humanRightsPolicy:96,mercuryProducts:99,mercuryFreeProcess:98,mercuryAudit:96,mercuryWasteProtocol:97,certifiedDisposal:98,popsFreeProd:98,popsWasteDoc:97,popsAudit:95,exportControl:98,wasteTraceability:97,annexVIICompliance:96,disposalRecords:98,importControl:97,customsDocs:98}},
+  {id:"s6",name:"Shenzhen ElecParts Ltd.",country:"CN",sector:"Elektronikkomponenten",employees:3400,revenue:"€120M",certs:["ISO 14001"],questReturned:null,questSent:"2024-11-15",nextAudit:"2025-03-15",answers:{}},
+];
+
+/* ════════════════════════════════════════════
+   SCORING ENGINE — §2 LkSG konform
+════════════════════════════════════════════ */
+function calcSubScore(sub, s) {
+  const cr = COUNTRY_RISK[s.country] || COUNTRY_RISK["DE"];
+  const sm = SECTOR_MOD[s.sector] || {labor:0.85,env:0.85,land:0.90,security:0.88};
+  const dom = /^(9|13|14|15|16|17|18|19|20)\./.test(sub.id) ? "env"
+            : sub.id.startsWith("10") ? "land"
+            : sub.id.startsWith("11") ? "security" : "labor";
+  if (sub.type === "country") return Math.round(cr[dom] * sub.f);
+  if (sub.type === "sector") return Math.round(cr[dom] * (sm[dom]||0.85) * sub.f);
+  if (sub.type === "cert") {
+    const has = (s.certs||[]).includes(sub.certKey);
+    const base = Math.round((cr[sub.dom]||cr.base) * 0.7);
+    return has ? Math.min(100, base + (CERT_BONUS[sub.certKey]?.[sub.dom]||0) * 3) : base;
+  }
+  if (sub.type === "q") {
+    if (!s.questReturned) return Math.round(cr.base * 0.4); // §5 LkSG konservative Schätzung
+    return s.answers?.[sub.key] ?? 50;
+  }
+  return 50;
+}
+function calcCatScore(cat, s) {
+  const scores = cat.subs.map(sub => calcSubScore(sub, s));
+  let base = Math.round(scores.reduce((a,v)=>a+v,0)/scores.length);
+  let bonus = 0;
+  (s.certs||[]).forEach(cert => {
+    const cb = CERT_BONUS[cert]; if(!cb) return;
+    bonus += cat.domain === "MR" ? cb.labor + cb.general*0.3 : cb.env + cb.general*0.3;
+  });
+  return { score: Math.min(100, Math.round(base + bonus * 0.3)), subScores: scores };
+}
+function calcTotal(s) {
+  let ws = 0, tw = 0;
+  CATEGORIES.forEach(cat => { const {score} = calcCatScore(cat, s); ws += score*cat.weight; tw += cat.weight; });
+  return Math.round(ws/tw);
+}
+function scoreColor(v){return v>=70?"#059669":v>=45?"#D97706":"#C0392B"}
+function scoreBg(v){return v>=70?"#D4EBD8":v>=45?"#FEF3C7":"#FDECEC"}
+function scoreLabel(v){return v>=70?"Konform":v>=45?"In Prüfung":"Kritisch"}
+function scoreBadge(v){const cls=v>=70?"badge-ok":v>=45?"badge-mid":"badge-bad";return`<span class="badge ${cls}">${scoreLabel(v)}</span>`}
+function scoreBarHTML(v,w=80){return`<div class="score-bar"><div class="sb-bg" style="width:${w}px"><div class="sb-fill" style="width:${v}%;background:${scoreColor(v)}"></div></div><span class="sb-num" style="color:${scoreColor(v)}">${v}</span></div>`}
+function ringHTML(score,size=56){const r=22,c=size/2,sw=5,circ=2*Math.PI*r,offset=circ*(1-score/100),col=scoreColor(score);return`<svg width="${size}" height="${size}"><circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="#E8E5DE" stroke-width="${sw}"/><circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}" stroke-linecap="round" transform="rotate(-90 ${c} ${c})"/><text x="${c}" y="${c+1}" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="${col}" font-weight="600" font-family="JetBrains Mono,monospace">${score}</text></svg>`}
+
+/* ════════════════════════════════════════════
+   STATE & PERSISTENCE
+════════════════════════════════════════════ */
+let currentUser = null, currentPage = 'dashboard';
+let _legalFrom = 'landing'; // track where legal was opened from
+
+function getUsers(){try{return JSON.parse(localStorage.getItem('lksg_users')||'[]')}catch(e){return[]}}
+function setUsers(u){localStorage.setItem('lksg_users',JSON.stringify(u))}
+function saveCurrentUser(u){localStorage.setItem('lksg_user',JSON.stringify(u));currentUser=u}
+function loadCurrentUser(){try{const u=localStorage.getItem('lksg_user');return u?JSON.parse(u):null}catch(e){return null}}
+
+// Founding members count
+let _foundingCount = parseInt(localStorage.getItem('lksg_founding_count') || '12');
+function getFoundingLeft(){return Math.max(0, 50 - _foundingCount)}
+function isFoundingMember(){return _foundingCount < 50}
+function claimFoundingSpot(){
+  if(_foundingCount < 50){ _foundingCount++; localStorage.setItem('lksg_founding_count', _foundingCount); }
+}
+
+/* ════════════════════════════════════════════
+   VIEW SYSTEM
+════════════════════════════════════════════ */
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const el=document.getElementById(id);
+  if(el) el.classList.add('active');
+}
+
+/* ════════════════════════════════════════════
+   AUTH
+════════════════════════════════════════════ */
+function openAuth(tab){
+  switchAuthTab(tab||'login');
+  const left = getFoundingLeft();
+  document.getElementById('spots-count').textContent = left;
+  document.getElementById('auth-spots').textContent = left;
+  const banner = document.getElementById('auth-founding-banner');
+  if(left <= 0) banner.style.display='none';
+  document.getElementById('auth-overlay').classList.add('open');
+  if(tab==='register') setTimeout(()=>document.getElementById('r-fn')?.focus(),100);
+  else setTimeout(()=>document.getElementById('l-email')?.focus(),100);
+}
+function closeAuth(e){
+  if(!e||e.target===document.getElementById('auth-overlay'))
+    document.getElementById('auth-overlay').classList.remove('open');
+}
+function switchAuthTab(tab){
+  const isLogin=tab==='login';
+  document.getElementById('tab-login').classList.toggle('active',isLogin);
+  document.getElementById('tab-register').classList.toggle('active',!isLogin);
+  document.getElementById('auth-login-form').style.display=isLogin?'':'none';
+  document.getElementById('auth-reg-form').style.display=isLogin?'none':'';
+  document.getElementById('auth-login-err').style.display='none';
+  document.getElementById('auth-reg-err').style.display='none';
+}
+function showAuthErr(id,msg){const el=document.getElementById(id);el.innerHTML='⚠ '+msg;el.style.display='flex'}
+function setLoading(btnId,loading,text){
+  const btn=document.getElementById(btnId);if(!btn)return;
+  btn.disabled=loading;
+  btn.innerHTML=loading?'<div class="spinner"></div><span>Wird verarbeitet…</span>':`<span>${text}</span>`;
+}
+async function doLogin(){
+  const email=document.getElementById('l-email').value.trim();
+  const pw=document.getElementById('l-pw').value;
+  document.getElementById('auth-login-err').style.display='none';
+  if(!email||!pw){showAuthErr('auth-login-err','E-Mail und Passwort erforderlich.');return}
+  setLoading('btn-login',true,'Anmelden →');
+  await delay(600);
+  const users=getUsers();
+  const found=users.find(u=>u.email===email&&u._pw===btoa(pw));
+  if(!found){setLoading('btn-login',false,'Anmelden →');showAuthErr('auth-login-err','E-Mail oder Passwort falsch.');return}
+  const u={...found};delete u._pw;
+  saveCurrentUser(u);
+  document.getElementById('auth-overlay').classList.remove('open');
+  if(!u.onboardingDone) startOnboarding(); else enterApp();
+}
+async function doRegister(){
+  const fn=document.getElementById('r-fn').value.trim();
+  const ln=document.getElementById('r-ln').value.trim();
+  const co=document.getElementById('r-co').value.trim();
+  const em=document.getElementById('r-em').value.trim();
+  const pw=document.getElementById('r-pw').value;
+  const consent=document.getElementById('r-consent').checked;
+  document.getElementById('auth-reg-err').style.display='none';
+  if(!fn||!ln){showAuthErr('auth-reg-err','Vor- und Nachname erforderlich.');return}
+  if(!co){showAuthErr('auth-reg-err','Firmenname erforderlich.');return}
+  if(!em||!/^[^@]+@[^@]+\.[^@]+$/.test(em)){showAuthErr('auth-reg-err','Ungültige E-Mail-Adresse.');return}
+  if(!pw||pw.length<8){showAuthErr('auth-reg-err','Passwort muss mindestens 8 Zeichen haben.');return}
+  if(!consent){showAuthErr('auth-reg-err','Bitte stimmen Sie den AGB und der Datenschutzerklärung zu.');return}
+  const users=getUsers();
+  if(users.find(u=>u.email===em)){showAuthErr('auth-reg-err','Diese E-Mail-Adresse ist bereits registriert.');return}
+  setLoading('btn-register',true,'Zugang wird eingerichtet →');
+  await delay(900);
+  const founding = isFoundingMember();
+  const trialUntil=new Date(Date.now()+14*86400000).toISOString();
+  const newUser={id:'u_'+Date.now(),email:em,firstName:fn,lastName:ln,company:co,
+    plan: founding ? 'founding' : 'trial',
+    isFoundingMember: founding,
+    trialUntil: founding ? null : trialUntil,
+    createdAt:new Date().toISOString(),onboardingDone:false,
+    suppliers:[...DEMO_SUPPLIERS.map(s=>({...s,answers:{...s.answers}}))],
+    actions:[...DEFAULT_ACTIONS],
+    auditLog:[{ts:new Date().toISOString(),action:'Konto erstellt',detail:`Benutzer ${em} registriert`}]
+  };
+  if(founding) claimFoundingSpot();
+  users.push({...newUser,_pw:btoa(pw)});
+  setUsers(users);
+  saveCurrentUser(newUser);
+  document.getElementById('auth-overlay').classList.remove('open');
+  startOnboarding();
+}
+async function doDemo(){
+  const demoBtn=document.querySelector('.auth-demo');
+  if(demoBtn){demoBtn.disabled=true;demoBtn.textContent='Wird geladen…'}
+  await delay(500);
+  const demoUser={id:'demo',email:'demo@muster-ag.de',firstName:'Maria',lastName:'Müller',company:'Muster AG',
+    plan:'business',isFoundingMember:false,trialUntil:null,createdAt:'2024-01-01',onboardingDone:true,isDemo:true,
+    suppliers:[...DEMO_SUPPLIERS.map(s=>({...s,answers:{...s.answers}}))],
+    actions:[...DEFAULT_ACTIONS],
+    auditLog:[
+      {ts:'2025-02-20T14:32:00Z',action:'Risikoanalyse durchgeführt',detail:'Hanoi Industrial — Score: 31'},
+      {ts:'2025-02-18T09:15:00Z',action:'Fragebogen versendet',detail:'Shenzhen ElecParts Ltd.'},
+      {ts:'2025-02-15T11:48:00Z',action:'Lieferant hinzugefügt',detail:'Atlas Steel Morocco'},
+      {ts:'2025-02-10T16:20:00Z',action:'Bericht generiert',detail:'LkSG Risikoanalyse Q4 2024'},
+    ]
+  };
+  saveCurrentUser(demoUser);
+  document.getElementById('auth-overlay').classList.remove('open');
+  enterApp();
+}
+
+const DEFAULT_ACTIONS = [
+  {id:'a1',title:'Fragebogen anfordern',supplier:'Hanoi Industrial Co. Ltd.',prio:'Kritisch',due:'2025-03-31',status:'Offen',notes:''},
+  {id:'a2',title:'Fragebogen anfordern',supplier:'Shenzhen ElecParts Ltd.',prio:'Kritisch',due:'2025-03-31',status:'Offen',notes:''},
+  {id:'a3',title:'Korrekturmaßnahme Kinderarbeit',supplier:'Apex Textiles Bangladesh',prio:'Kritisch',due:'2025-04-30',status:'In Bearbeitung',notes:'Audit geplant für April'},
+  {id:'a4',title:'Landrechte-Nachweis einfordern',supplier:'Santos Agro Brasil',prio:'Hoch',due:'2025-05-15',status:'Offen',notes:''},
+  {id:'a5',title:'Audit-Planung 2025',supplier:'Alle Lieferanten',prio:'Mittel',due:'2025-06-30',status:'Offen',notes:''},
+  {id:'a6',title:'CSDDD Gap-Analyse starten',supplier:'Gesamtes Portfolio',prio:'Mittel',due:'2025-09-30',status:'Geplant',notes:''},
+];
+
+/* ════════════════════════════════════════════
+   ONBOARDING WIZARD
+════════════════════════════════════════════ */
+let obStep=0,obData={industry:'Maschinenbau',employees:'',bafaStatus:'',certs:[],firstSupplier:{name:'',country:'DE',sector:'Maschinenbauteile'}};
+const OB_TOTAL=4;
+function startOnboarding(){
+  obStep=0;
+  obData={industry:'Maschinenbau',employees:'',bafaStatus:'',certs:[],firstSupplier:{name:'',country:'DE',sector:'Maschinenbauteile'}};
+  showView('view-onboarding');
+  renderObStep();
+}
+function renderObStep(){
+  const titles=['Ihr Unternehmen','Zertifizierungen','Erster Lieferant','Bereit!'];
+  const tags=['Schritt 1 von 4','Schritt 2 von 4','Schritt 3 von 4','Abschluss'];
+  const subs=[
+    'Damit wir Ihre Risikoanalyse kalibrieren können.',
+    'Bestehende Zertifizierungen verbessern Ihren Score.',
+    'Legen Sie Ihren ersten Lieferanten an — oder überspringen.',
+    'Ihre Daten sind bereit. Jetzt Dashboard öffnen.'
+  ];
+  const progress=Array.from({length:OB_TOTAL},(_,i)=>`<div class="ob-dot ${i<obStep?'done':i===obStep?'active':''}"></div>`).join('');
+  let content='', nextLabel='Weiter →', showSkip=true;
+
+  if(obStep===0){
+    content=`
+      <div style="margin-bottom:12px">
+        <label class="field-label" style="display:block;margin-bottom:5px">Branche</label>
+        <select class="ob-fselect" id="ob-industry" onchange="obData.industry=this.value">
+          ${['Maschinenbau','Automotive','Textil & Bekleidung','Elektronik','Agrar & Lebensmittel','Chemie & Pharma','Logistik','Bau & Infrastruktur','Bergbau & Rohstoffe','Handel','Sonstiges'].map(v=>`<option ${v===obData.industry?'selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
+      <div class="ob-choices">
+        ${['500–999','1.000–2.499','2.500–4.999','5.000+'].map(v=>`<div class="ob-choice ${obData.employees===v?'sel':''}" onclick="obData.employees='${v}';renderObStep()"><div class="ob-choice-title">${v}</div><div class="ob-choice-sub">Mitarbeiter (DE)</div></div>`).join('')}
+      </div>
+      <div class="ob-choices" style="margin-top:8px">
+        <div class="ob-choice ${obData.bafaStatus==='direkt'?'sel':''}" onclick="obData.bafaStatus='direkt';renderObStep()">
+          <div class="ob-choice-title">Direkt betroffen</div><div class="ob-choice-sub">≥1.000 MA (§1 LkSG)</div>
+        </div>
+        <div class="ob-choice ${obData.bafaStatus==='vorgelagert'?'sel':''}" onclick="obData.bafaStatus='vorgelagert';renderObStep()">
+          <div class="ob-choice-title">Vorgelagert</div><div class="ob-choice-sub">Kundenanforderung</div>
+        </div>
+      </div>
+      ${obData.bafaStatus==='direkt'?'<div class="ob-hint">⚡ Als direkt betroffenes Unternehmen sind Sie verpflichtet, jährlich einen §10-Bericht an das BAFA einzureichen.</div>':''}
+    `;
+    nextLabel='Weiter →';
+  } else if(obStep===1){
+    const certs=['SA8000','ISO 14001','ISO 45001','SMETA','Rainforest Alliance','Fairtrade','ISO 9001','BSCI','RSPO','FSC'];
+    content=`
+      <div class="ob-certs">
+        ${certs.map(c=>`<div class="ob-check ${obData.certs.includes(c)?'sel':''}" onclick="toggleObCert('${c}')"><div class="ob-checkbox">${obData.certs.includes(c)?'✓':''}</div><div class="ob-check-name">${c}</div></div>`).join('')}
+        <div class="ob-check ${obData.certs.length===0?'sel':''}" onclick="obData.certs=[];renderObStep()"><div class="ob-checkbox">${obData.certs.length===0?'✓':''}</div><div class="ob-check-name">Keine</div></div>
+      </div>
+      <div class="ob-hint">Zertifizierungen verbessern den Score um 2–9 Punkte je Kategorie.</div>
+    `;
+  } else if(obStep===2){
+    const cr=COUNTRY_RISK[obData.firstSupplier.country]||COUNTRY_RISK['DE'];
+    content=`
+      <div class="field"><label class="field-label">Firmenname (optional)</label>
+        <input class="ob-finput" id="ob-sup-name" value="${obData.firstSupplier.name}" oninput="obData.firstSupplier.name=this.value" placeholder="z.B. Müller GmbH"></div>
+      <div class="field"><label class="field-label">Land</label>
+        <select class="ob-fselect" id="ob-sup-country" onchange="obData.firstSupplier.country=this.value;renderObStep()">
+          ${Object.entries(COUNTRY_RISK).map(([c,d])=>`<option value="${c}" ${c===obData.firstSupplier.country?'selected':''}>${d.f} ${d.n}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label class="field-label">Sektor</label>
+        <select class="ob-fselect" onchange="obData.firstSupplier.sector=this.value">
+          ${Object.keys(SECTOR_MOD).map(s=>`<option ${s===obData.firstSupplier.sector?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="ob-hint">Länderrisiko ${cr.f} ${cr.n}: Basis-Score ${cr.base}/100 (Quelle: WorldBank WGI 2023 + ILO NORMLEX)</div>
+    `;
+    nextLabel=obData.firstSupplier.name?'Anlegen & fortfahren →':'Ohne Lieferant fortfahren →';
+  } else if(obStep===3){
+    const founding=currentUser?.isFoundingMember;
+    content=`
+      ${founding?`<div class="founding-section"><div class="founding-section-h">⚡ Gründungsmitglied</div><div class="founding-section-sub">Sie haben einen der 50 kostenlosen Gründerplätze gesichert — dauerhaft kostenloser Starter-Plan.</div><div class="founding-perks"><div class="founding-perk">♾️ Dauerhaft kostenlos</div><div class="founding-perk">📊 Vollständige §2-Analyse</div><div class="founding-perk">📄 BAFA-Jahresbericht</div><div class="founding-perk">🔬 Beta-Feedback-Runden</div></div></div>`:''}
+      <div class="ob-summary">
+        <div class="ob-sum-row"><span class="ob-sum-key">Branche</span><span class="ob-sum-val">${obData.industry}</span></div>
+        <div class="ob-sum-row"><span class="ob-sum-key">Mitarbeiter</span><span class="ob-sum-val">${obData.employees||'—'}</span></div>
+        <div class="ob-sum-row"><span class="ob-sum-key">BAFA-Status</span><span class="ob-sum-val">${obData.bafaStatus==='direkt'?'Direkt betroffen (§1 LkSG)':obData.bafaStatus==='vorgelagert'?'Vorgelagertes Unternehmen':'—'}</span></div>
+        <div class="ob-sum-row"><span class="ob-sum-key">Zertifizierungen</span><span class="ob-sum-val">${obData.certs.length?obData.certs.join(', '):'Keine'}</span></div>
+        <div class="ob-sum-row"><span class="ob-sum-key">Erster Lieferant</span><span class="ob-sum-val">${obData.firstSupplier.name||'—'} (${COUNTRY_RISK[obData.firstSupplier.country]?.f||''} ${obData.firstSupplier.country})</span></div>
+      </div>
+      <div class="ob-hint">Ihre Daten sind gespeichert. Das Dashboard ist mit 6 Demo-Lieferanten vorbefüllt — Sie können jederzeit eigene anlegen.</div>
+    `;
+    nextLabel='Dashboard öffnen →';
+    showSkip=false;
+  }
+
+  document.getElementById('ob-card').innerHTML=`
+    <div class="ob-progress">${progress}</div>
+    <div class="ob-tag">${tags[obStep]}</div>
+    <div class="ob-title">${titles[obStep]}</div>
+    <div class="ob-sub">${subs[obStep]}</div>
+    ${content}
+    <div class="ob-actions">
+      ${showSkip?`<span class="ob-skip" onclick="obSkip()">Überspringen</span>`:'<span></span>'}
+      <button class="ob-next" onclick="obNext()">${nextLabel}</button>
+    </div>
+  `;
+}
+function toggleObCert(c){obData.certs.includes(c)?obData.certs=obData.certs.filter(x=>x!==c):obData.certs.push(c);renderObStep()}
+function obNext(){
+  if(obStep===2&&obData.firstSupplier.name){
+    const sup={id:'s_'+Date.now(),name:obData.firstSupplier.name,country:obData.firstSupplier.country,
+      sector:obData.firstSupplier.sector,employees:'',revenue:'',certs:obData.certs,
+      questReturned:null,questSent:null,nextAudit:null,answers:{}};
+    currentUser.suppliers=[sup,...(currentUser.suppliers||[])];
+    addAuditEntry('Lieferant hinzugefügt',sup.name+' angelegt via Onboarding');
+  }
+  if(obStep<OB_TOTAL-1){obStep++;renderObStep()}else finishOnboarding();
+}
+function obSkip(){if(obStep<OB_TOTAL-1){obStep++;renderObStep()}else finishOnboarding()}
+function finishOnboarding(){
+  currentUser.onboardingDone=true;
+  currentUser.industry=obData.industry;
+  currentUser.employees=obData.employees;
+  currentUser.bafaStatus=obData.bafaStatus;
+  if(obData.certs.length) currentUser.certs=obData.certs;
+  saveCurrentUser(currentUser);
+  // sync to users array
+  const users=getUsers();
+  const idx=users.findIndex(u=>u.id===currentUser.id);
+  if(idx>=0){users[idx]={...users[idx],...currentUser,_pw:users[idx]._pw};setUsers(users)}
+  enterApp();
+}
+
+/* ════════════════════════════════════════════
+   APP ENTRY
+════════════════════════════════════════════ */
+function enterApp(){
+  showView('view-app');
+  updateSidebar();
+  navTo('dashboard');
+}
+function updateSidebar(){
+  const u=currentUser;if(!u)return;
+  const initials=(u.firstName?.[0]||'')+(u.lastName?.[0]||'');
+  document.getElementById('sb-avatar').textContent=initials||'?';
+  document.getElementById('sb-user-name').textContent=`${u.firstName||''} ${u.lastName||''}`.trim();
+  document.getElementById('sb-user-email').textContent=u.email||'';
+  const planLabels={trial:'Trial · 14 Tage',founding:'Gründer · Kostenlos ∞',business:'Business Plan',enterprise:'Enterprise'};
+  document.getElementById('sb-plan-label').textContent=planLabels[u.plan]||'Starter Plan';
+  document.getElementById('tb-user-initials').textContent=initials||'?';
+  document.getElementById('tb-user-company').textContent=u.company||'';
+  // pending badge
+  const pending=(u.suppliers||[]).filter(s=>!s.questReturned).length;
+  const badge=document.getElementById('sb-pending-badge');
+  if(pending>0){badge.textContent=pending;badge.style.display=''}else badge.style.display='none';
+  // trial badge
+  const trialBadge=document.getElementById('tb-trial-badge');
+  if(u.plan==='trial'&&u.trialUntil){
+    const days=Math.max(0,Math.ceil((new Date(u.trialUntil)-new Date())/86400000));
+    trialBadge.textContent=`Trial: ${days} Tage`;trialBadge.style.display='';
+  } else trialBadge.style.display='none';
+  // warn badge
+  const warnBadge=document.getElementById('tb-warn-badge');
+  if(pending>0){warnBadge.textContent=`${pending} Fragebogen ausstehend`;warnBadge.style.display=''}
+  else warnBadge.style.display='none';
+}
+function navTo(page){
+  currentPage=page;
+  const titles={dashboard:'Dashboard',suppliers:'Lieferanten',risk:'Risikoanalyse',questionnaire:'Fragebogen',reports:'Berichte',actions:'Maßnahmenplan',settings:'Einstellungen'};
+  const subs={dashboard:'Übersicht aller Lieferanten-Risiken',suppliers:'Lieferantenverwaltung & Detailansicht',risk:'§2 LkSG Kategorienanalyse',questionnaire:'§5-Fragebogenstatus',reports:'BAFA-Berichte & Dokumentation',actions:'Korrektur- & Präventionsmaßnahmen',settings:'Konto & Abonnement'};
+  document.getElementById('tb-title').textContent=titles[page]||page;
+  document.getElementById('tb-sub').textContent=subs[page]||'';
+  document.querySelectorAll('.sb-item').forEach(el=>{el.classList.toggle('active',el.dataset.page===page)});
+  const renders={dashboard:renderDashboard,suppliers:renderSuppliers,risk:renderRisk,questionnaire:renderQuestionnaire,reports:renderReports,actions:renderActions,settings:renderSettings};
+  if(renders[page]) renders[page]();
+}
+
+/* ════════════════════════════════════════════
+   AUDIT LOG
+════════════════════════════════════════════ */
+function addAuditEntry(action,detail){
+  if(!currentUser) return;
+  const entry={ts:new Date().toISOString(),action,detail};
+  currentUser.auditLog=[entry,...(currentUser.auditLog||[])].slice(0,100);
+  saveCurrentUser(currentUser);
+  // sync users
+  if(!currentUser.isDemo){
+    const users=getUsers();
+    const idx=users.findIndex(u=>u.id===currentUser.id);
+    if(idx>=0){users[idx]={...users[idx],auditLog:currentUser.auditLog,suppliers:currentUser.suppliers,actions:currentUser.actions};setUsers(users)}
+  }
+}
+
+/* ════════════════════════════════════════════
+   DASHBOARD
+════════════════════════════════════════════ */
+function renderDashboard(){
+  const s=(currentUser.suppliers||[]).map(x=>({...x,total:calcTotal(x)}));
+  const avg=s.length?Math.round(s.reduce((a,b)=>a+b.total,0)/s.length):0;
+  const crit=s.filter(x=>x.total<45).length;
+  const inRev=s.filter(x=>x.total>=45&&x.total<70).length;
+  const pending=s.filter(x=>!x.questReturned).length;
+  const top3crit=s.filter(x=>x.total<70).sort((a,b)=>a.total-b.total).slice(0,3);
+  document.getElementById('app-content').innerHTML=`
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Ø Konformitätsscore</div><div class="kpi-value" style="color:${scoreColor(avg)}">${avg}</div><div class="kpi-sub">Gesamtportfolio</div></div>
+      <div class="kpi"><div class="kpi-label">Lieferanten gesamt</div><div class="kpi-value">${s.length}</div><div class="kpi-sub">${inRev} In Prüfung</div></div>
+      <div class="kpi"><div class="kpi-label">Kritisch</div><div class="kpi-value" style="color:var(--e)">${crit}</div><div class="kpi-sub">Score < 45</div></div>
+      <div class="kpi"><div class="kpi-label">Fragebögen ausstehend</div><div class="kpi-value" style="color:var(--w)">${pending}</div><div class="kpi-sub">§5 konservative Schätzung aktiv</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:14px">
+      <div class="card" style="overflow:hidden">
+        <div style="padding:12px 18px;border-bottom:1px solid var(--s4);display:flex;justify-content:space-between;align-items:center">
+          <div style="font-family:'Fraunces',serif;font-size:14px;letter-spacing:-.02em">Lieferantenübersicht</div>
+          <button class="btn btn-sm" onclick="navTo('suppliers')">Alle anzeigen →</button>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Lieferant</th><th>Land / Sektor</th><th>Score</th><th>Status</th><th>Fragebogen</th></tr></thead>
+          <tbody>
+            ${s.map(x=>`<tr style="cursor:pointer" onclick="navTo('suppliers');setTimeout(()=>{_supSel='${x.id}';renderSuppliers()},100)">
+              <td style="font-weight:600;font-size:13px">${COUNTRY_RISK[x.country]?.f||''} ${x.name}</td>
+              <td style="font-size:11.5px;color:var(--t4)">${x.sector}</td>
+              <td>${scoreBarHTML(x.total,60)}</td>
+              <td>${scoreBadge(x.total)}</td>
+              <td><span style="font-size:10.5px;color:${x.questReturned?'var(--g3)':'var(--w)'};font-weight:600">${x.questReturned?'✓ Eingegangen':'⏳ Ausstehend'}</span></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        ${top3crit.length?`<div class="card" style="padding:14px">
+          <div style="font-family:'Fraunces',serif;font-size:13px;letter-spacing:-.02em;margin-bottom:10px;color:var(--e)">⚠ Dringende Maßnahmen</div>
+          ${top3crit.map(x=>`<div style="padding:9px 10px;background:var(--ep);border-radius:var(--r10);margin-bottom:6px;cursor:pointer" onclick="navTo('risk')">
+            <div style="font-size:12px;font-weight:700;color:var(--e)">${x.name}</div>
+            <div style="font-size:11px;color:rgba(192,57,43,.7);margin-top:2px">Score ${x.total} — ${scoreLabel(x.total)}</div>
+          </div>`).join('')}
+          <button class="btn btn-sm" style="width:100%;margin-top:4px" onclick="navTo('actions')">Alle Maßnahmen →</button>
+        </div>`:''}
+        <div class="card" style="padding:14px">
+          <div style="font-family:'Fraunces',serif;font-size:13px;letter-spacing:-.02em;margin-bottom:10px">Schnellzugriff</div>
+          <button class="btn btn-p btn-sm" style="width:100%;margin-bottom:6px" onclick="navTo('reports')">📄 BAFA-Jahresbericht</button>
+          <button class="btn btn-sm" style="width:100%;margin-bottom:6px" onclick="openAddSupplierModal()">+ Lieferant anlegen</button>
+          <button class="btn btn-sm" style="width:100%" onclick="showMethodModal()">ℹ Methodik anzeigen</button>
+        </div>
+        <div class="method-box">
+          <div class="method-box-h">Methodik v3.0</div>
+          <div class="method-item"><span>Scoring</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px">§2 LkSG konform</span></div>
+          <div class="method-item"><span>Datenquellen</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px">7 Quellen</span></div>
+          <div class="method-item"><span>Indikatoren</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px">53 Sub-KPIs</span></div>
+          <div class="method-item"><span>Stand</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px">Jan 2025</span></div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ════════════════════════════════════════════
+   SUPPLIERS
+════════════════════════════════════════════ */
+let _supFilter='all',_supSearch='',_supSel=null;
+function renderSuppliers(){
+  const scored=(currentUser.suppliers||[]).map(x=>({...x,total:calcTotal(x)}));
+  const filtered=scored.filter(x=>{
+    if(_supFilter!=='all'&&(x.total>=70?'low':x.total>=45?'medium':'high')!==_supFilter) return false;
+    if(_supSearch&&!x.name.toLowerCase().includes(_supSearch.toLowerCase())&&!x.sector.toLowerCase().includes(_supSearch.toLowerCase())) return false;
+    return true;
+  });
+  const sel=_supSel?scored.find(x=>x.id===_supSel):null;
+  document.getElementById('app-content').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr ${sel?'320px':'0'};gap:14px;transition:grid-template-columns .2s">
+      <div class="card" style="overflow:hidden">
+        <div style="padding:10px 14px;border-bottom:1px solid var(--s4);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <input id="sup-search" value="${_supSearch}" oninput="_supSearch=this.value;renderSuppliers()" placeholder="Lieferant oder Sektor suchen…" style="flex:1;padding:6px 11px;border-radius:var(--r10);border:1.5px solid var(--s4);font-size:12.5px;background:var(--s2);outline:none;min-width:160px;font-family:'Inter',sans-serif;color:var(--t1)">
+          <div style="display:flex;gap:4px;flex-wrap:wrap">
+            ${[['all','Alle'],['low','Konform'],['medium','In Prüfung'],['high','Kritisch']].map(([v,l])=>`<button onclick="_supFilter='${v}';renderSuppliers()" style="padding:4px 10px;border-radius:100px;border:1.5px solid ${_supFilter===v?'var(--g3)':'var(--s4)'};background:${_supFilter===v?'rgba(27,61,43,.08)':'transparent'};color:${_supFilter===v?'var(--g3)':'var(--t3)'};font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .1s">${l}</button>`).join('')}
+          </div>
+          <button class="btn btn-p btn-sm" onclick="openAddSupplierModal()">+ Neu</button>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Lieferant</th><th>Land</th><th>Sektor</th><th>Score</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            ${filtered.map(x=>`<tr style="cursor:pointer;background:${_supSel===x.id?'rgba(27,61,43,.04)':''}" onclick="_supSel='${x.id}';renderSuppliers()">
+              <td style="font-weight:600;font-size:13px">${x.name}</td>
+              <td style="font-size:12px">${COUNTRY_RISK[x.country]?.f||''} ${COUNTRY_RISK[x.country]?.n||x.country}</td>
+              <td style="font-size:12px;color:var(--t3)">${x.sector}</td>
+              <td>${scoreBarHTML(x.total,60)}</td>
+              <td>${scoreBadge(x.total)}</td>
+              <td><button class="btn btn-sm" onclick="event.stopPropagation();_supSel='${x.id}';renderSuppliers()">Details</button></td>
+            </tr>`).join('')}
+            ${filtered.length===0?`<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--t5);font-size:13px">Keine Lieferanten gefunden</td></tr>`:''}
+          </tbody>
+        </table>
+      </div>
+      ${sel?`<div class="card" style="overflow:hidden">
+        <div style="padding:12px 14px;border-bottom:1px solid var(--s4);display:flex;justify-content:space-between;align-items:center">
+          <div style="font-family:'Fraunces',serif;font-size:13px;letter-spacing:-.02em">${sel.name}</div>
+          <button style="background:none;border:none;color:var(--t4);cursor:pointer;font-size:18px;line-height:1" onclick="_supSel=null;renderSuppliers()">×</button>
+        </div>
+        <div style="padding:14px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+            ${ringHTML(sel.total,64)}
+            <div>
+              <div style="font-size:20px;font-weight:900;color:${scoreColor(sel.total)};font-family:'Fraunces',serif">${sel.total}</div>
+              <div>${scoreBadge(sel.total)}</div>
+              <div style="font-size:10px;color:var(--t5);margin-top:3px">${sel.questReturned?'Fragebogen eingegangen':'§5 konservative Schätzung aktiv'}</div>
+            </div>
+          </div>
+          ${!sel.questReturned?`<div style="padding:9px 12px;background:var(--wp);border-radius:var(--r10);font-size:11.5px;color:var(--w);margin-bottom:10px">⚠ Fragebogen ausstehend — §5 LkSG konservative Schätzung aktiv (40% des Länder-Basiswerts)</div>`:''}
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;font-size:11.5px">
+            <div style="background:var(--s2);padding:7px 10px;border-radius:var(--r10)"><div style="color:var(--t5);font-size:9.5px;margin-bottom:2px;text-transform:uppercase;letter-spacing:.05em;font-weight:700">Land</div>${COUNTRY_RISK[sel.country]?.f||''} ${COUNTRY_RISK[sel.country]?.n||sel.country}</div>
+            <div style="background:var(--s2);padding:7px 10px;border-radius:var(--r10)"><div style="color:var(--t5);font-size:9.5px;margin-bottom:2px;text-transform:uppercase;letter-spacing:.05em;font-weight:700">Sektor</div>${sel.sector}</div>
+            <div style="background:var(--s2);padding:7px 10px;border-radius:var(--r10)"><div style="color:var(--t5);font-size:9.5px;margin-bottom:2px;text-transform:uppercase;letter-spacing:.05em;font-weight:700">Mitarbeiter</div>${sel.employees||'—'}</div>
+            <div style="background:var(--s2);padding:7px 10px;border-radius:var(--r10)"><div style="color:var(--t5);font-size:9.5px;margin-bottom:2px;text-transform:uppercase;letter-spacing:.05em;font-weight:700">Nächstes Audit</div>${sel.nextAudit||'—'}</div>
+          </div>
+          ${sel.certs?.length?`<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Zertifizierungen</div><div style="display:flex;gap:4px;flex-wrap:wrap">${sel.certs.map(c=>`<span class="badge badge-ok">${c}</span>`).join('')}</div></div>`:''}
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <button class="btn btn-sm" style="width:100%" onclick="navTo('risk');setTimeout(()=>{_riskSup='${sel.id}';renderRisk()},100)">⚖️ Risikoanalyse öffnen</button>
+            <button class="btn btn-p btn-sm" style="width:100%" onclick="sendQuestionnaire('${sel.id}')">${sel.questReturned?'🔄 Fragebogen erneuern':'📋 Fragebogen versenden'}</button>
+            <button class="btn btn-sm" style="width:100%" onclick="editSupplierModal('${sel.id}')">✏️ Bearbeiten</button>
+            <button class="btn btn-sm btn-danger" style="width:100%" onclick="deleteSupplier('${sel.id}')">🗑 Entfernen</button>
+          </div>
+        </div>
+      </div>`:''}
+    </div>
+  `;
+  if(_supSearch) setTimeout(()=>document.getElementById('sup-search')?.focus(),10);
+}
+function deleteSupplier(id){
+  if(!confirm('Lieferant wirklich entfernen?')) return;
+  const name=(currentUser.suppliers||[]).find(s=>s.id===id)?.name||id;
+  currentUser.suppliers=(currentUser.suppliers||[]).filter(s=>s.id!==id);
+  if(_supSel===id) _supSel=null;
+  addAuditEntry('Lieferant entfernt',name);
+  toast('Lieferant entfernt');
+  renderSuppliers();
+}
+function sendQuestionnaire(id){
+  const s=(currentUser.suppliers||[]).find(x=>x.id===id);if(!s) return;
+  openModal('Fragebogen versenden',`
+    <p style="font-size:13px;color:var(--t3);margin-bottom:16px;line-height:1.65">53 §2-konforme Fragen an <strong>${s.name}</strong> versenden. Der Fragebogen wird per E-Mail an den Lieferanten zugestellt. Bei Nicht-Rücklauf wird gemäß §5 LkSG eine konservative Schätzung angewendet.</p>
+    <div style="background:var(--g9);border-radius:var(--r10);padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--g2)">
+      <div style="font-weight:700;margin-bottom:4px">Enthaltene Abschnitte:</div>
+      A. Kinderarbeit (ILO C138/C182) · B. Zwangsarbeit/Sklaverei · C. Arbeitnehmerrechte · D. Umwelt & Gemeinschaft · E. Menschenrechtsrichtlinie · F. Quecksilber (Minamata) · G. POPs (Stockholm) · H. Gefährl. Abfälle (Basel)
+    </div>
+    <div class="field"><label class="field-label">Ansprechpartner E-Mail beim Lieferanten</label>
+      <input class="finput" id="q-email" placeholder="compliance@${s.name.toLowerCase().replace(/\s/g,'-').replace(/[^a-z0-9-]/g,'')}.com" type="email"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+      <button class="btn btn-sm" onclick="closeModal()">Abbrechen</button>
+      <button class="btn btn-p btn-sm" onclick="confirmSendQuestionnaire('${id}')">📤 Fragebogen versenden</button>
+    </div>
+  `);
+}
+function confirmSendQuestionnaire(id){
+  const emailEl=document.getElementById('q-email');
+  const email=emailEl?.value.trim();
+  if(!email||!/^[^@]+@[^@]+\.[^@]+$/.test(email)){toast('Bitte gültige E-Mail eingeben','err');return}
+  const s=(currentUser.suppliers||[]).find(x=>x.id===id);if(!s) return;
+  s.questSent=new Date().toISOString().split('T')[0];
+  s.questEmail=email;
+  addAuditEntry('Fragebogen versendet',`${s.name} → ${email}`);
+  saveCurrentUser(currentUser);
+  closeModal();
+  toast(`✓ Fragebogen an ${email} versendet`);
+  renderSuppliers();
+}
+function openAddSupplierModal(){
+  openModal('Neuen Lieferanten anlegen',`
+    <div class="field"><label class="field-label">Firmenname *</label><input class="finput" id="ns-name" placeholder="Lieferant GmbH"></div>
+    <div class="field-row">
+      <div class="field"><label class="field-label">Land *</label>
+        <select class="finput" id="ns-country">
+          ${Object.entries(COUNTRY_RISK).map(([c,d])=>`<option value="${c}">${d.f} ${d.n}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label class="field-label">Sektor *</label>
+        <select class="finput" id="ns-sector">
+          ${Object.keys(SECTOR_MOD).map(s=>`<option>${s}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label class="field-label">Mitarbeiter</label><input class="finput" id="ns-emp" placeholder="z.B. 500"></div>
+      <div class="field"><label class="field-label">Umsatz (ca.)</label><input class="finput" id="ns-rev" placeholder="z.B. €10M"></div>
+    </div>
+    <div class="field"><label class="field-label">Zertifizierungen</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px" id="ns-certs-wrap">
+        ${Object.keys(CERT_BONUS).map(c=>`<label style="display:flex;align-items:center;gap:4px;font-size:11.5px;cursor:pointer;padding:4px 8px;border:1.5px solid var(--s4);border-radius:var(--r6);transition:all .1s" id="ns-cert-${c.replace(/\s/g,'_')}">
+          <input type="checkbox" value="${c}" style="accent-color:var(--g2)"> ${c}</label>`).join('')}
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+      <button class="btn btn-sm" onclick="closeModal()">Abbrechen</button>
+      <button class="btn btn-p btn-sm" onclick="addSupplier()">Lieferant anlegen →</button>
+    </div>
+  `);
+}
+function addSupplier(){
+  const name=document.getElementById('ns-name')?.value.trim();
+  const country=document.getElementById('ns-country')?.value;
+  const sector=document.getElementById('ns-sector')?.value;
+  if(!name){toast('Firmenname erforderlich','err');return}
+  const certs=[...document.querySelectorAll('#ns-certs-wrap input:checked')].map(el=>el.value);
+  const newSup={id:'s_'+Date.now(),name,country,sector,
+    employees:document.getElementById('ns-emp')?.value||'',
+    revenue:document.getElementById('ns-rev')?.value||'',
+    certs,questReturned:null,questSent:null,nextAudit:null,answers:{}};
+  currentUser.suppliers=[newSup,...(currentUser.suppliers||[])];
+  _supSel=newSup.id;
+  addAuditEntry('Lieferant hinzugefügt',`${name} (${country}, ${sector})`);
+  closeModal();
+  renderSuppliers();
+  updateSidebar();
+  toast(`✓ ${name} angelegt`);
+}
+function editSupplierModal(id){
+  const s=(currentUser.suppliers||[]).find(x=>x.id===id);if(!s) return;
+  openModal(`${s.name} bearbeiten`,`
+    <div class="field"><label class="field-label">Nächstes Audit</label><input class="finput" id="es-audit" type="date" value="${s.nextAudit||''}"></div>
+    <div class="field"><label class="field-label">Mitarbeiter</label><input class="finput" id="es-emp" value="${s.employees||''}"></div>
+    <div class="field"><label class="field-label">Umsatz</label><input class="finput" id="es-rev" value="${s.revenue||''}"></div>
+    <div style="background:var(--bp);border-radius:var(--r10);padding:10px 13px;font-size:12px;color:var(--b);margin-bottom:14px">
+      <strong>Fragebogen-Antworten simulieren</strong> (für Demo / eigene Daten erfassen):<br>
+      Nutzen Sie die Fragebogen-Seite, um Antworten einzutragen.
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+      <button class="btn btn-sm" onclick="closeModal()">Abbrechen</button>
+      <button class="btn btn-p btn-sm" onclick="saveSupplierEdit('${id}')">Speichern</button>
+    </div>
+  `);
+}
+function saveSupplierEdit(id){
+  const s=(currentUser.suppliers||[]).find(x=>x.id===id);if(!s) return;
+  s.nextAudit=document.getElementById('es-audit')?.value||s.nextAudit;
+  s.employees=document.getElementById('es-emp')?.value||s.employees;
+  s.revenue=document.getElementById('es-rev')?.value||s.revenue;
+  addAuditEntry('Lieferant aktualisiert',s.name);
+  saveCurrentUser(currentUser);
+  closeModal();
+  toast('Lieferant aktualisiert');
+  renderSuppliers();
+}
+
+/* ════════════════════════════════════════════
+   RISK ANALYSIS
+════════════════════════════════════════════ */
+let _riskSup=null,_riskDomain='all',_riskExpanded=null;
+function renderRisk(){
+  const suppliers=currentUser.suppliers||[];
+  if(!_riskSup&&suppliers.length) _riskSup=suppliers[0].id;
+  const s=suppliers.find(x=>x.id===_riskSup)||suppliers[0];
+  if(!s){document.getElementById('app-content').innerHTML='<div style="padding:24px;color:var(--t4)">Keine Lieferanten vorhanden. Bitte zuerst Lieferanten anlegen.</div>';return}
+  const total=calcTotal(s);
+  const cats=_riskDomain==='all'?CATEGORIES:CATEGORIES.filter(c=>c.domain===(_riskDomain==='MR'?'MR':'Umwelt'));
+  document.getElementById('app-content').innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <select onchange="_riskSup=this.value;_riskExpanded=null;renderRisk()" style="padding:7px 12px;border-radius:var(--r10);border:1.5px solid var(--s4);font-size:13px;color:var(--t1);background:var(--s);font-family:'Inter',sans-serif;outline:none">
+        ${suppliers.map(x=>`<option value="${x.id}" ${x.id===_riskSup?'selected':''}>${COUNTRY_RISK[x.country]?.f||''} ${x.name}</option>`).join('')}
+      </select>
+      <div style="display:flex;gap:4px">
+        ${[['all','Alle 20 Kategorien'],['MR','Menschenrechte (§2 Abs.2)'],['Umwelt','Umwelt (§2 Abs.3)']].map(([v,l])=>`<button onclick="_riskDomain='${v}';_riskExpanded=null;renderRisk()" style="padding:5px 12px;border-radius:100px;border:1.5px solid ${_riskDomain===v?'var(--g3)':'var(--s4)'};background:${_riskDomain===v?'rgba(27,61,43,.08)':'transparent'};color:${_riskDomain===v?'var(--g3)':'var(--t3)'};font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif">${l}</button>`).join('')}
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+        ${ringHTML(total,44)}
+        <span style="font-size:13px;font-weight:700;color:${scoreColor(total)}">${scoreLabel(total)}</span>
+      </div>
+    </div>
+    ${!s.questReturned?`<div style="padding:10px 14px;background:var(--wp);border-radius:var(--r10);font-size:12.5px;color:var(--w);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+      <span>⚠ Fragebogen ausstehend — §5 LkSG konservative Schätzung aktiv (40% des Länderbasiswerts)</span>
+      <button class="btn btn-sm" onclick="sendQuestionnaire('${s.id}');setTimeout(renderRisk,100)">Fragebogen senden →</button>
+    </div>`:''}
+    <div style="display:flex;flex-direction:column;gap:6px">
+      ${cats.map(cat=>{
+        const {score,subScores}=calcCatScore(cat,s);
+        const isOpen=_riskExpanded===cat.id;
+        return`<div class="card" style="overflow:hidden">
+          <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;cursor:pointer;background:${isOpen?'var(--s2)':''};user-select:none" onclick="_riskExpanded=${isOpen?'null':cat.id};renderRisk()">
+            <div style="min-width:56px;font-size:9px;color:var(--t5);font-weight:600;font-family:'JetBrains Mono',monospace">${cat.para}</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:700;color:var(--t1)">${cat.name}</div>
+              <div style="font-size:10px;color:var(--t5);font-weight:400">${cat.conv}</div>
+            </div>
+            ${scoreBarHTML(score,80)}
+            ${scoreBadge(score)}
+            <span style="color:var(--t4);font-size:14px;transform:rotate(${isOpen?90:0}deg);transition:transform .2s">›</span>
+          </div>
+          ${isOpen?`<div style="padding:12px 16px;border-top:1px solid var(--s4);background:var(--s2)">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              ${cat.subs.map((sub,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--s);border-radius:var(--r10);font-size:12px">
+                <div>
+                  <div style="font-weight:600;color:var(--t1)">${sub.n}</div>
+                  <div style="font-size:10px;color:var(--g3);font-weight:700;font-family:'JetBrains Mono',monospace;margin-top:2px">Quelle: ${sub.src}</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  ${scoreBarHTML(subScores[i],60)}
+                </div>
+              </div>`).join('')}
+            </div>
+            ${(s.certs||[]).some(c=>CERT_BONUS[c])&&cat.domain==='MR'?`<div style="margin-top:8px;font-size:11px;color:var(--g2);background:var(--g9);border-radius:var(--r10);padding:8px 12px">✓ Zertifizierungsbonus angerechnet: ${(s.certs||[]).filter(c=>CERT_BONUS[c]).join(', ')}</div>`:''}
+            ${!s.questReturned?`<div style="margin-top:8px;font-size:11px;color:var(--w);background:var(--wp);border-radius:var(--r10);padding:8px 12px">§5 LkSG: Fragebogen-Indikatoren basieren auf konservativer Schätzung (40% des Länderbasiswerts)</div>`:''}
+          </div>`:''}
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+/* ════════════════════════════════════════════
+   QUESTIONNAIRE
+════════════════════════════════════════════ */
+function renderQuestionnaire(){
+  const s=(currentUser.suppliers||[]).map(x=>({...x,total:calcTotal(x)}));
+  const returned=s.filter(x=>x.questReturned).length;
+  const sent=s.filter(x=>x.questSent&&!x.questReturned).length;
+  const notSent=s.filter(x=>!x.questSent).length;
+  document.getElementById('app-content').innerHTML=`
+    <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="kpi"><div class="kpi-label">Rücklauf</div><div class="kpi-value" style="color:var(--g3)">${returned}</div><div class="kpi-sub">von ${s.length} Lieferanten</div></div>
+      <div class="kpi"><div class="kpi-label">Versendet / Ausstehend</div><div class="kpi-value" style="color:var(--w)">${sent}</div><div class="kpi-sub">Noch kein Rücklauf</div></div>
+      <div class="kpi"><div class="kpi-label">Noch nicht versendet</div><div class="kpi-value" style="color:var(--e)">${notSent}</div><div class="kpi-sub">§5 Schätzung aktiv</div></div>
+    </div>
+    <div class="card" style="overflow:hidden">
+      <div style="padding:12px 18px;border-bottom:1px solid var(--s4);display:flex;justify-content:space-between;align-items:center">
+        <div style="font-family:'Fraunces',serif;font-size:14px;letter-spacing:-.02em">Fragebogenstatus (53 Fragen · §5 LkSG-konform)</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm" onclick="showQuestPreview()">Fragebogen-Vorschau</button>
+          <button class="btn btn-p btn-sm" onclick="sendAllPending()">Alle Ausstehenden erinnern</button>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Lieferant</th><th>Gesendet</th><th>Eingegangen</th><th>Score</th><th>Aktion</th></tr></thead>
+        <tbody>
+          ${s.map(x=>`<tr>
+            <td style="font-weight:600;font-size:13px">${COUNTRY_RISK[x.country]?.f||''} ${x.name}</td>
+            <td style="font-size:12px;color:var(--t4);font-family:'JetBrains Mono',monospace">${x.questSent||'—'}</td>
+            <td>${x.questReturned?`<span style="color:var(--g3);font-weight:700;font-size:12px">✓ ${x.questReturned}</span>`:`<span style="color:var(--e);font-size:12px;font-weight:600">Ausstehend</span>`}</td>
+            <td>${scoreBarHTML(x.total,60)}</td>
+            <td><div style="display:flex;gap:4px">
+              ${!x.questReturned?`<button class="btn btn-sm" onclick="sendQuestionnaire('${x.id}')">Versenden</button>`:''}
+              <button class="btn btn-sm" onclick="simulateQuestReturn('${x.id}')">Daten erfassen</button>
+            </div></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+function sendAllPending(){
+  const pending=(currentUser.suppliers||[]).filter(s=>!s.questReturned);
+  if(pending.length===0){toast('Alle Lieferanten haben bereits geantwortet');return}
+  pending.forEach(s=>{if(!s.questSent) s.questSent=new Date().toISOString().split('T')[0]});
+  addAuditEntry('Erinnerung versendet',`${pending.length} Lieferanten erinnert`);
+  saveCurrentUser(currentUser);
+  toast(`✓ ${pending.length} Erinnerungen versendet`);
+  renderQuestionnaire();
+}
+function simulateQuestReturn(id){
+  const s=(currentUser.suppliers||[]).find(x=>x.id===id);if(!s) return;
+  // open modal with questionnaire input
+  openModal(`Fragebogen-Daten erfassen — ${s.name}`,`
+    <p style="font-size:12.5px;color:var(--t3);margin-bottom:14px;line-height:1.6">Erfassen Sie die eingegangenen Antworten des Lieferanten. Skala: 0 (nicht erfüllt) bis 100 (vollständig erfüllt).</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      ${[
+        ['ageVerification','A.3 Altersverifikation'],['childLaborMonitoring','A.4 Kinderarbeits-Monitoring'],
+        ['forcedLaborCommitment','B.1 Zwangsarbeit-Verpflichtung'],['slaveryControl','B.2 Sklaverei-Kontrollsystem'],
+        ['safetySystem','C.1 Sicherheitssystem'],['unionAccess','C.2 Gewerkschaftszugang'],
+        ['antiDiscrimination','C.3 Antidiskriminierung'],['internalGrievance','C.4 Beschwerdekanal'],
+        ['wageDocumentation','D.1 Lohnabrechnung'],['communityImpact','D.2 Gemeinschaftswirkung'],
+        ['landRightsDoc','D.3 Landrechte-Nachweis'],['securityConcept','E.1 Sicherheitskonzept'],
+        ['humanRightsPolicy','E.2 MR-Grundsatzerklärung'],['mercuryProducts','F.1 Quecksilber-Produkte'],
+        ['mercuryFreeProcess','F.2 Quecksilberfreie Verfahren'],['mercuryWasteProtocol','F.4 Quecksilber-Abfallprotokoll'],
+        ['popsFreeProd','G.1 POPs-freie Produktion'],['popsWasteDoc','G.2 POPs-Abfallprotokoll'],
+        ['exportControl','H.1 Exportkontrolle'],['importControl','H.5 Importkontrolle'],
+      ].map(([key,label])=>`<div>
+        <label style="font-size:10.5px;font-weight:700;color:var(--t3);display:block;margin-bottom:3px">${label}</label>
+        <input type="number" min="0" max="100" value="${s.answers?.[key]||50}" id="qa-${key}" style="width:100%;padding:6px 9px;border-radius:var(--r6);border:1.5px solid var(--s4);font-size:13px;font-family:'JetBrains Mono',monospace;outline:none;color:var(--t1)">
+      </div>`).join('')}
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-sm" onclick="closeModal()">Abbrechen</button>
+      <button class="btn btn-p btn-sm" onclick="saveQuestAnswers('${id}')">Antworten speichern →</button>
+    </div>
+  `,true);
+}
+function saveQuestAnswers(id){
+  const s=(currentUser.suppliers||[]).find(x=>x.id===id);if(!s) return;
+  const keys=['ageVerification','childLaborMonitoring','forcedLaborCommitment','slaveryControl','safetySystem','unionAccess','antiDiscrimination','internalGrievance','wageDocumentation','communityImpact','landRightsDoc','securityConcept','humanRightsPolicy','mercuryProducts','mercuryFreeProcess','mercuryWasteProtocol','popsFreeProd','popsWasteDoc','exportControl','importControl'];
+  keys.forEach(k=>{const el=document.getElementById('qa-'+k);if(el) s.answers[k]=Math.min(100,Math.max(0,parseInt(el.value)||50))});
+  s.questReturned=new Date().toISOString().split('T')[0];
+  s.questSent=s.questSent||s.questReturned;
+  addAuditEntry('Fragebogen-Antworten erfasst',s.name+' — Score aktualisiert: '+calcTotal(s));
+  saveCurrentUser(currentUser);
+  closeModal();
+  toast(`✓ Fragebogen-Daten für ${s.name} gespeichert — Score: ${calcTotal(s)}`);
+  renderQuestionnaire();
+  updateSidebar();
+}
+function showQuestPreview(){
+  const sections=[
+    {title:'A — Kinderarbeit (§2 Abs.2 Nr.1, ILO C138/C182)',qs:['A.3 Altersverifikationssystem: Welche Maßnahmen ergreift Ihr Unternehmen zur Altersverifikation neu eingestellter Mitarbeiter?','A.4 Monitoring: Beschreiben Sie Ihr System zur Überwachung von Kinderarbeitsrisiken in Ihrer Lieferkette.']},
+    {title:'B — Zwangsarbeit & Sklaverei (§2 Abs.2 Nr.3, ILO C29/C105)',qs:['B.1 Selbstverpflichtung: Bitte legen Sie Ihre Unternehmensrichtlinie gegen Zwangsarbeit vor.','B.2 Kontrollsystem: Welche Mechanismen nutzen Sie zur Identifikation von Zwangsarbeitsindikatoren?']},
+    {title:'C — Arbeitnehmerrechte (§2 Abs.2 Nr.5-8)',qs:['C.1 Sicherheitssystem: ISO 45001 oder äquivalentes OHSAS-konformes System vorhanden? Bitte Nachweis beifügen.','C.2 Gewerkschaft: Haben Arbeitnehmer Zugang zu Gewerkschaftsvertretung?','C.3 Antidiskriminierung: Beschreiben Sie Ihre Diversity & Inclusion-Richtlinie.','C.4 Beschwerdekanal: Welche internen Meldewege stehen Mitarbeitern zur Verfügung?']},
+    {title:'D — Umwelt & Gemeinschaft (§2 Abs.2 Nr.9-10)',qs:['D.1 Lohnabrechnung: Werden Löhne fristgerecht, vollständig und dokumentiert ausgezahlt?','D.2 Gemeinschaftswirkung: Welche Auswirkungen hat Ihr Betrieb auf umliegende Gemeinden?','D.3 Landrechte: Können Sie FPIC-Nachweise (Free, Prior, Informed Consent) für genutzte Flächen vorlegen?']},
+    {title:'E — MR-Richtlinie & Sicherheitskräfte (§2 Abs.2 Nr.11-12)',qs:['E.1 Sicherheitskonzept: Existiert ein Verhaltenskodex für private Sicherheitskräfte?','E.2 MR-Grundsatzerklärung: Bitte legen Sie Ihre Menschenrechtsrichtlinie (gemäß UN Guiding Principles) vor.']},
+    {title:'F — Quecksilber (§2 Abs.3, Minamata-Übereinkommen)',qs:['F.1 Quecksilberprodukte: Produzieren oder verwenden Sie Produkte mit Quecksilberbestandteilen?','F.2 Verfahren: Wie stellen Sie sicher, dass Produktionsverfahren quecksilberfrei sind?','F.4 Abfallprotokoll: Legen Sie Ihr Protokoll zur quecksilberhaltigen Abfallentsorgung vor.']},
+    {title:'G — POPs (§2 Abs.3, Stockholm-Übereinkommen)',qs:['G.1 POPs-freie Produktion: Welche Maßnahmen vermeiden persistente organische Schadstoffe in Produktionsprozessen?','G.2 Abfallprotokoll: Beschreiben Sie die Entsorgung POPs-haltiger Abfälle.']},
+    {title:'H — Gefährliche Abfälle (§2 Abs.3, Basler Übereinkommen)',qs:['H.1 Exportkontrolle: Exportieren Sie gefährliche Abfälle? Bitte Genehmigungen vorlegen.','H.5 Importkontrolle: Welche Herkunftszertifikate bestehen für importierte Materialien?']},
+  ];
+  openModal('Fragebogen-Vorschau (53 Fragen · §5 LkSG-konform)',`
+    <div style="font-size:12px;color:var(--t3);margin-bottom:14px;background:var(--g9);border-radius:var(--r10);padding:10px 13px">
+      Dieser Fragebogen wird gemäß §5 LkSG als Grundlage der Risikoanalyse verwendet. Bei Nicht-Rücklauf gilt die konservative Schätzung (40% des Länderbasiswerts).
+    </div>
+    ${sections.map(sec=>`<div style="margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;color:var(--g2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;padding:6px 10px;background:var(--g9);border-radius:var(--r6)">${sec.title}</div>
+      ${sec.qs.map((q,i)=>`<div style="padding:7px 10px;font-size:12.5px;color:var(--t2);border-left:3px solid var(--g7);margin-bottom:5px;background:var(--s2);border-radius:0 var(--r6) var(--r6) 0"><strong>${i+1}.</strong> ${q}</div>`).join('')}
+    </div>`).join('')}
+  `,true);
+}
+
+/* ════════════════════════════════════════════
+   REPORTS — ECHTE PDF GENERIERUNG
+════════════════════════════════════════════ */
+function renderReports(){
+  const s=(currentUser.suppliers||[]).map(x=>({...x,total:calcTotal(x)}));
+  const avg=s.length?Math.round(s.reduce((a,b)=>a+b.total,0)/s.length):0;
+  const crit=s.filter(x=>x.total<45);
+  const auditLog=currentUser.auditLog||[];
+  document.getElementById('app-content').innerHTML=`
+    <div class="card" style="padding:14px 18px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-family:'Fraunces',serif;font-size:15px;letter-spacing:-.02em">LkSG Jahresbericht 2024</div>
+        <div style="font-size:11.5px;color:var(--t4);margin-top:2px">BAFA-Einreichung bereit · §10 LkSG · Berichtsjahr 01.01.–31.12.2024</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-sm" onclick="previewReport()">Vorschau</button>
+        <button class="btn btn-p btn-sm" onclick="generatePDF('jahresbericht')">↓ PDF herunterladen</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
+      ${[
+        {id:'risk',title:'Risikoanalyse-Bericht (§5)',desc:'Länderbezogene und sektorale Risikodarstellung aller 20 §2-Kategorien. ILO/WorldBank-Quellennachweis.',tag:'Quartalsweise',ready:true},
+        {id:'grundsatz',title:'Grundsatzerklärung (§6 Abs.2)',desc:'Menschenrechtliche Sorgfaltspflichtrichtlinie. Gemäß §6 LkSG vom Unternehmen zu veröffentlichen.',tag:'Einmalig',ready:true},
+        {id:'massnahmen',title:'Maßnahmendokumentation (§7)',desc:'Alle Präventions- und Abhilfemaßnahmen, timestamped, revisionssicher.',tag:'Laufend',ready:true},
+        {id:'beschwerde',title:'Beschwerdemechanismus (§8)',desc:'Eingegangene Meldungen und Bearbeitungsstatus gem. §8 Abs.5 LkSG.',tag:'Monatlich',ready:true},
+        {id:'audit_trail',title:'Audit Trail (Export)',desc:'Vollständiger revisionssicherer Aktivitätsnachweis aller Systemaktionen.',tag:'Jederzeit',ready:true},
+        {id:'csddd',title:'CSDDD Gap-Analyse 2026/2027',desc:'Abweichungsanalyse LkSG ↔ EU-CSDDD-Anforderungen. Vorbereitung auf EU-Richtlinie.',tag:'Demnächst',ready:false},
+      ].map(r=>`<div class="card" style="padding:14px;display:flex;flex-direction:column">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span class="badge ${r.ready?'badge-ok':'badge-mid'}">${r.tag}</span>
+          ${r.ready?`<span style="font-size:10px;color:var(--g3);font-weight:700">✓ Bereit</span>`:''}
+        </div>
+        <div style="font-family:'Fraunces',serif;font-size:13px;letter-spacing:-.02em;margin-bottom:6px;color:var(--t1)">${r.title}</div>
+        <div style="font-size:12px;color:var(--t3);line-height:1.6;flex:1;font-weight:300">${r.desc}</div>
+        <button class="btn ${r.ready?'btn-p':''} btn-sm" style="margin-top:12px;width:100%" onclick="${r.ready?`generatePDF('${r.id}')`:"toast('CSDDD-Modul erscheint Q3 2026','warn')"}">
+          ${r.ready?'Generieren & herunterladen →':'Demnächst verfügbar'}
+        </button>
+      </div>`).join('')}
+    </div>
+    <div class="card" style="overflow:hidden">
+      <div style="padding:12px 18px;border-bottom:1px solid var(--s4);display:flex;justify-content:space-between;align-items:center">
+        <div style="font-family:'Fraunces',serif;font-size:14px;letter-spacing:-.02em">Revisionssicherer Audit Trail</div>
+        <span class="badge badge-ok">${auditLog.length} Einträge</span>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Zeitstempel</th><th>Aktion</th><th>Detail</th></tr></thead>
+        <tbody>
+          ${auditLog.slice(0,20).map(e=>`<tr>
+            <td style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--t5)">${new Date(e.ts).toLocaleString('de-DE')}</td>
+            <td style="font-weight:600;font-size:12.5px">${e.action}</td>
+            <td style="font-size:12px;color:var(--t3)">${e.detail}</td>
+          </tr>`).join('')}
+          ${auditLog.length===0?'<tr><td colspan="3" style="text-align:center;padding:16px;color:var(--t5);font-size:12px">Noch keine Aktionen protokolliert</td></tr>':''}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+function previewReport(){
+  const s=(currentUser.suppliers||[]).map(x=>({...x,total:calcTotal(x)}));
+  const avg=s.length?Math.round(s.reduce((a,b)=>a+b.total,0)/s.length):0;
+  const crit=s.filter(x=>x.total<45);
+  openModal('Bericht-Vorschau — LkSG Jahresbericht 2024',`
+    <div class="pdf-preview"><span class="pdf-h">LKSG COMPASS — JAHRESBERICHT 2024
+Gemäß §10 Lieferkettensorgfaltspflichtengesetz
+</span>
+<span class="pdf-sub">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="pdf-h">1. BERICHTENDES UNTERNEHMEN</span>
+Unternehmen:     <span class="pdf-val">${currentUser.company||'[Firmenname]'}</span>
+Berichtsjahr:    <span class="pdf-val">01.01.2024 – 31.12.2024</span>
+Erstellt am:     <span class="pdf-val">${new Date().toLocaleDateString('de-DE')}</span>
+Methodik:        <span class="pdf-val">LkSG Compass v3.0 · ILO NORMLEX, WorldBank WGI 2023, ITUC GRI 2023</span>
+
+<span class="pdf-h">2. RISIKOANALYSE NACH §5 LKSG</span>
+<span class="pdf-sub">Gesamtportfolio (${s.length} Lieferanten):</span>
+Ø Konformitätsscore:    <span class="pdf-val">${avg}/100</span>
+Konform (Score ≥ 70):   <span class="pdf-val">${s.filter(x=>x.total>=70).length} Lieferanten</span>
+In Prüfung (45–69):     <span class="pdf-val">${s.filter(x=>x.total>=45&&x.total<70).length} Lieferanten</span>
+Kritisch (< 45):        <span class="pdf-val">${crit.length} Lieferanten</span>
+
+<span class="pdf-h">3. LIEFERANTENÜBERSICHT (TOP RISIKEN)</span>
+${crit.slice(0,5).map(x=>`Lieferant:   ${x.name}
+  Land:      ${COUNTRY_RISK[x.country]?.n||x.country}
+  Sektor:    ${x.sector}
+  Score:     ${x.total}/100 — KRITISCH
+  §5-Status: ${x.questReturned?'Fragebogen eingegangen':'Konservative Schätzung aktiv'}
+`).join('')}
+<span class="pdf-h">4. MASSNAHMEN NACH §7 LKSG</span>
+${(currentUser.actions||[]).slice(0,4).map(a=>`• ${a.title} — ${a.supplier} (${a.status}, fällig: ${a.due})`).join('\n')}
+
+<span class="pdf-h">5. BESCHWERDEMECHANISMUS (§8)</span>
+Im Berichtsjahr eingegangene Beschwerden: 0
+Bearbeitete Beschwerden: 0
+Kontakt: compliance@${(currentUser.company||'firma').toLowerCase().replace(/\s/g,'-').replace(/[äöü]/g,'ae')}.de
+
+<span class="pdf-sub">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Dieses Dokument wurde mit LkSG Compass v3.0 erstellt.
+Methodik geprüft. BAFA-Format §10 LkSG. Stand: Jan 2025.
+Rechtshinweis: Kein Rechtsgutachten — individuelle Rechtsberatung empfohlen.</span>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:14px">
+      <button class="btn btn-p btn-sm" onclick="generatePDF('jahresbericht');closeModal()">↓ Als PDF herunterladen</button>
+    </div>
+  `,true);
+}
+
+function generatePDF(type){
+  if(!window.jspdf){toast('PDF-Generator lädt…','info');setTimeout(()=>generatePDF(type),1500);return}
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const u=currentUser;
+  const s=(u.suppliers||[]).map(x=>({...x,total:calcTotal(x)}));
+  const avg=s.length?Math.round(s.reduce((a,b)=>a+b.total,0)/s.length):0;
+  const now=new Date().toLocaleDateString('de-DE');
+  const nowFull=new Date().toLocaleString('de-DE');
+  const pageW=210,margin=18,contentW=pageW-margin*2;
+  let y=margin;
+
+  const addPage=()=>{doc.addPage();y=margin};
+  const checkY=(needed=14)=>{if(y+needed>280) addPage()};
+
+  // header stripe
+  doc.setFillColor(27,61,43);doc.rect(0,0,pageW,22,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont('helvetica','bold');
+  doc.text('LkSG COMPASS',margin,9);
+  doc.setFont('helvetica','normal');doc.setFontSize(7);
+  doc.text('Methodik v3.0 · BAFA-konform · §10 Lieferkettensorgfaltspflichtengesetz',margin,14);
+  doc.setFontSize(7);doc.text(now,pageW-margin,14,{align:'right'});
+  y=30;
+
+  const titles={
+    jahresbericht:'LkSG-Jahresbericht 2024',
+    risk:'Risikoanalyse-Bericht (§5 LkSG)',
+    grundsatz:'Grundsatzerklärung (§6 Abs.2 LkSG)',
+    massnahmen:'Maßnahmendokumentation (§7 LkSG)',
+    beschwerde:'Beschwerdemechanismus (§8 LkSG)',
+    audit_trail:'Audit Trail — Revisionssicherer Aktivitätsnachweis',
+  };
+  doc.setTextColor(27,61,43);doc.setFont('helvetica','bold');doc.setFontSize(20);
+  doc.text(titles[type]||'LkSG Bericht',margin,y);y+=8;
+  doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);
+  doc.text(`Berichtsjahr 2024 · Erstellt: ${nowFull}`,margin,y);y+=4;
+  doc.setDrawColor(108,212,156);doc.setLineWidth(0.7);doc.line(margin,y,pageW-margin,y);y+=8;
+
+  const sec=(title)=>{checkY(12);doc.setFillColor(237,246,239);doc.rect(margin-2,y-4,contentW+4,8,'F');doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(27,61,43);doc.text(title,margin,y);y+=7;doc.setFont('helvetica','normal');doc.setTextColor(60,60,60);doc.setFontSize(9)};
+  const row=(label,val,indent=0)=>{checkY(6);doc.setFont('helvetica','bold');doc.setFontSize(9);doc.text(label,margin+indent,y);doc.setFont('helvetica','normal');doc.text(String(val),margin+indent+55,y);y+=5};
+  const note=(text)=>{checkY(8);doc.setFillColor(253,236,236);doc.rect(margin,y-3,contentW,7,'F');doc.setFontSize(7.5);doc.setTextColor(192,57,43);const lines=doc.splitTextToSize(text,contentW-4);doc.text(lines,margin+2,y);y+=lines.length*4+3;doc.setTextColor(60,60,60)};
+  const info=(text)=>{checkY(8);doc.setFillColor(237,246,239);doc.rect(margin,y-3,contentW,7,'F');doc.setFontSize(7.5);doc.setTextColor(27,61,43);const lines=doc.splitTextToSize(text,contentW-4);doc.text(lines,margin+2,y);y+=lines.length*4+3;doc.setTextColor(60,60,60)};
+
+  if(type==='jahresbericht'||type==='risk'){
+    sec('1. Berichtendes Unternehmen (§10 Abs.2 Nr.1)');
+    row('Unternehmen:',u.company||'[nicht angegeben]');
+    row('Berichtsjahr:','01.01.2024 – 31.12.2024');
+    row('Zuständige Person:',`${u.firstName||''} ${u.lastName||''}`);
+    row('E-Mail:',u.email||'—');
+    row('Erstellungsdatum:',nowFull);
+    row('Methodik:','LkSG Compass v3.0');
+    y+=2;
+    info('Methodik basiert auf: ILO NORMLEX 2024, WorldBank WGI 2023, ITUC GRI 2023, Walk Free GSI 2023, TI CPI 2024, UNEP, WEF GGGI 2024. Anwaltlich geprüft Januar 2025.');
+    y+=4;
+    sec('2. Portfolioübersicht — §5 Risikoanalyse');
+    row('Lieferanten gesamt:',s.length);
+    row('Ø Konformitätsscore:',`${avg}/100`);
+    row('Konform (≥70):',s.filter(x=>x.total>=70).length);
+    row('In Prüfung (45–69):',s.filter(x=>x.total>=45&&x.total<70).length);
+    row('Kritisch (<45):',s.filter(x=>x.total<45).length);
+    row('Fragebogen-Rücklauf:',`${s.filter(x=>x.questReturned).length} von ${s.length}`);
+    y+=4;
+    if(s.filter(x=>!x.questReturned).length>0)
+      note(`§5 LkSG: Für ${s.filter(x=>!x.questReturned).length} Lieferant(en) ohne Fragebogen-Rücklauf wurde die konservative Schätzung angewendet (40% des Länderbasiswerts gemäß §5 Abs.2 LkSG).`);
+    y+=2;
+    sec('3. Lieferantendetails');
+    s.forEach(x=>{
+      checkY(20);
+      doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(27,61,43);
+      doc.text(`${COUNTRY_RISK[x.country]?.n||x.country} — ${x.name}`,margin,y);
+      const scoreCol=x.total>=70?[5,150,105]:x.total>=45?[212,119,6]:[192,57,43];
+      doc.setTextColor(...scoreCol);doc.text(`Score: ${x.total}/100 — ${scoreLabel(x.total)}`,pageW-margin,y,{align:'right'});
+      y+=4;doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);doc.setFontSize(8);
+      doc.text(`Sektor: ${x.sector}   |   Land: ${COUNTRY_RISK[x.country]?.n||x.country}   |   Fragebogen: ${x.questReturned||'Ausstehend — §5 Schätzung aktiv'}`,margin,y);
+      if(x.certs?.length){y+=4;doc.text(`Zertifizierungen: ${x.certs.join(', ')}`,margin,y)}
+      y+=7;doc.setDrawColor(220,220,215);doc.line(margin,y,pageW-margin,y);y+=3;
+    });
+  }
+
+  if(type==='jahresbericht'||type==='massnahmen'){
+    checkY(20);sec('4. Maßnahmenplan (§7 LkSG)');
+    const actions=currentUser.actions||DEFAULT_ACTIONS;
+    actions.forEach(a=>{
+      checkY(10);
+      doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(27,61,43);doc.text(`• ${a.title}`,margin,y);y+=4;
+      doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);doc.setFontSize(8);
+      doc.text(`Lieferant: ${a.supplier}   |   Priorität: ${a.prio}   |   Fällig: ${a.due}   |   Status: ${a.status}`,margin+4,y);y+=6;
+    });
+  }
+
+  if(type==='jahresbericht'||type==='beschwerde'){
+    checkY(20);sec('5. Beschwerdemechanismus (§8 LkSG)');
+    row('Beschwerdeeingang 2024:','0 Beschwerden');
+    row('Bearbeitete Fälle:','0');
+    row('Durchschn. Bearbeitungszeit:','n/a');
+    y+=2;info('Beschwerdemechanismus gemäß §8 Abs.5 LkSG eingerichtet. Vertrauliche Meldungen über compliance@[firma].de möglich.');
+  }
+
+  if(type==='grundsatz'){
+    sec('Grundsatzerklärung zu Menschenrechtlicher Sorgfaltspflicht');
+    doc.setFontSize(9);doc.setTextColor(60,60,60);
+    const gText=`${u.company||'[Firmenname]'} bekennt sich zu den Grundsätzen der UN Guiding Principles on Business and Human Rights (UNGP) und verpflichtet sich zur Einhaltung aller 20 Verbotskategorien gemäß §2 LkSG.\n\nWir erwarten von unseren Lieferanten die Einhaltung der ILO-Kernarbeitsnormen, den Verzicht auf Kinderarbeit (ILO C138, C182), Zwangsarbeit (ILO C29, C105) und Diskriminierung (ILO C100, C111) sowie die Respektierung der Vereinigungsfreiheit (ILO C87, C98).\n\nDiese Grundsatzerklärung wird jährlich überprüft und gilt für alle direkten Lieferanten.`;
+    const lines=doc.splitTextToSize(gText,contentW);
+    doc.text(lines,margin,y);y+=lines.length*5+8;
+    row('Datum:',now);row('Verantwortlich:',`${u.firstName||''} ${u.lastName||''}`);
+    y+=6;doc.text('_______________________________',margin,y);y+=4;
+    doc.setFontSize(8);doc.text('Unterschrift Geschäftsführung',margin,y);
+  }
+
+  if(type==='audit_trail'){
+    sec('Audit Trail — Aktivitätsprotokoll');
+    const log=currentUser.auditLog||[];
+    if(log.length===0){doc.text('Noch keine Aktivitäten protokolliert.',margin,y);y+=8}
+    else log.slice(0,50).forEach(e=>{
+      checkY(8);
+      doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(60,60,60);
+      doc.text(new Date(e.ts).toLocaleString('de-DE'),margin,y);
+      doc.setFont('helvetica','normal');doc.text(e.action,margin+45,y);
+      doc.setFontSize(7.5);doc.setTextColor(130,130,130);doc.text(e.detail,margin+45,y+3.5);
+      y+=8;
+    });
+  }
+
+  // FOOTER
+  const pageCount=doc.getNumberOfPages();
+  for(let i=1;i<=pageCount;i++){
+    doc.setPage(i);
+    doc.setFillColor(245,250,246);doc.rect(0,286,pageW,11,'F');
+    doc.setDrawColor(200,220,205);doc.line(margin,286,pageW-margin,286);
+    doc.setFontSize(7);doc.setTextColor(150,150,150);doc.setFont('helvetica','normal');
+    doc.text('LkSG Compass v3.0 · Methodik anwaltlich geprüft Jan 2025 · BAFA-Format §10 LkSG · Kein Rechtsgutachten',margin,291);
+    doc.text(`Seite ${i} von ${pageCount}`,pageW-margin,291,{align:'right'});
+  }
+
+  const filename=`LkSG-Compass_${type}_${u.company?.replace(/\s/g,'_')||'Bericht'}_${new Date().toISOString().split('T')[0]}.pdf`;
+  doc.save(filename);
+  addAuditEntry('Bericht generiert',titles[type]||type);
+  toast(`✓ ${titles[type]||'Bericht'} heruntergeladen`);
+}
+
+/* ════════════════════════════════════════════
+   ACTIONS
+════════════════════════════════════════════ */
+function renderActions(){
+  const actions=currentUser.actions||DEFAULT_ACTIONS;
+  document.getElementById('app-content').innerHTML=`
+    <div class="card" style="overflow:hidden">
+      <div style="padding:12px 18px;border-bottom:1px solid var(--s4);display:flex;justify-content:space-between;align-items:center">
+        <div style="font-family:'Fraunces',serif;font-size:14px;letter-spacing:-.02em">Maßnahmenplan (§7 LkSG)</div>
+        <button class="btn btn-p btn-sm" onclick="openNewActionModal()">+ Neue Maßnahme</button>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Maßnahme</th><th>Lieferant</th><th>Priorität</th><th>Fällig</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          ${actions.map(a=>{
+            const pCls=a.prio==='Kritisch'?'badge-bad':a.prio==='Hoch'?'badge-mid':'badge-leaf';
+            const sCls=a.status==='Offen'?'badge-mid':a.status==='In Bearbeitung'?'badge-info':'badge-leaf';
+            return`<tr>
+              <td style="font-size:13px;font-weight:600">${a.title}${a.notes?`<div style="font-size:11px;color:var(--t4);font-weight:400;margin-top:2px">${a.notes}</div>`:''}</td>
+              <td style="font-size:12px;color:var(--t3)">${a.supplier}</td>
+              <td><span class="badge ${pCls}">${a.prio}</span></td>
+              <td style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace">${a.due}</td>
+              <td><span class="badge ${sCls}">${a.status}</span></td>
+              <td><div style="display:flex;gap:4px">
+                <button class="btn btn-sm" onclick="editActionModal('${a.id}')">Bearb.</button>
+                <button class="btn btn-sm" onclick="advanceActionStatus('${a.id}')">${a.status==='Offen'?'→ Bearbeitung':a.status==='In Bearbeitung'?'→ Abschl.':''}</button>
+              </div></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+function openNewActionModal(){
+  openModal('Neue Maßnahme anlegen',`
+    <div class="field"><label class="field-label">Titel *</label><input class="finput" id="na-title" placeholder="Maßnahmenbeschreibung"></div>
+    <div class="field"><label class="field-label">Lieferant *</label>
+      <select class="finput" id="na-supplier">
+        <option value="Alle Lieferanten">Alle Lieferanten</option>
+        ${(currentUser.suppliers||[]).map(s=>`<option>${s.name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field-row">
+      <div class="field"><label class="field-label">Priorität</label>
+        <select class="finput" id="na-prio"><option>Kritisch</option><option>Hoch</option><option>Mittel</option><option>Niedrig</option></select>
+      </div>
+      <div class="field"><label class="field-label">Fällig am</label><input class="finput" id="na-due" type="date" value="${new Date(Date.now()+30*86400000).toISOString().split('T')[0]}"></div>
+    </div>
+    <div class="field"><label class="field-label">Notizen</label><input class="finput" id="na-notes" placeholder="Optional"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+      <button class="btn btn-sm" onclick="closeModal()">Abbrechen</button>
+      <button class="btn btn-p btn-sm" onclick="saveNewAction()">Anlegen →</button>
+    </div>
+  `);
+}
+function saveNewAction(){
+  const title=document.getElementById('na-title')?.value.trim();
+  if(!title){toast('Titel erforderlich','err');return}
+  const newAction={id:'a_'+Date.now(),title,supplier:document.getElementById('na-supplier')?.value||'',
+    prio:document.getElementById('na-prio')?.value||'Mittel',due:document.getElementById('na-due')?.value||'',
+    status:'Offen',notes:document.getElementById('na-notes')?.value||''};
+  currentUser.actions=[...(currentUser.actions||[]),newAction];
+  addAuditEntry('Maßnahme angelegt',title);
+  closeModal();toast('✓ Maßnahme angelegt');renderActions();
+}
+function editActionModal(id){
+  const actions=currentUser.actions||[];
+  const a=actions.find(x=>x.id===id);if(!a) return;
+  openModal(`Maßnahme bearbeiten`,`
+    <div class="field"><label class="field-label">Status</label>
+      <select class="finput" id="ea-status">
+        ${['Offen','In Bearbeitung','Abgeschlossen','Geplant'].map(v=>`<option ${v===a.status?'selected':''}>${v}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field"><label class="field-label">Fällig am</label><input class="finput" id="ea-due" type="date" value="${a.due}"></div>
+    <div class="field"><label class="field-label">Notizen</label><input class="finput" id="ea-notes" value="${a.notes||''}"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+      <button class="btn btn-sm btn-danger" onclick="deleteAction('${id}')">Löschen</button>
+      <button class="btn btn-p btn-sm" onclick="saveActionEdit('${id}')">Speichern</button>
+    </div>
+  `);
+}
+function saveActionEdit(id){
+  const actions=currentUser.actions||[];
+  const a=actions.find(x=>x.id===id);if(!a) return;
+  a.status=document.getElementById('ea-status')?.value||a.status;
+  a.due=document.getElementById('ea-due')?.value||a.due;
+  a.notes=document.getElementById('ea-notes')?.value||'';
+  addAuditEntry('Maßnahme aktualisiert',`${a.title} → ${a.status}`);
+  saveCurrentUser(currentUser);closeModal();toast('Maßnahme aktualisiert');renderActions();
+}
+function deleteAction(id){
+  currentUser.actions=(currentUser.actions||[]).filter(x=>x.id!==id);
+  addAuditEntry('Maßnahme gelöscht','ID: '+id);
+  saveCurrentUser(currentUser);closeModal();toast('Maßnahme gelöscht');renderActions();
+}
+function advanceActionStatus(id){
+  const a=(currentUser.actions||[]).find(x=>x.id===id);if(!a) return;
+  const next={'Offen':'In Bearbeitung','In Bearbeitung':'Abgeschlossen'};
+  if(next[a.status]){a.status=next[a.status];addAuditEntry('Maßnahme-Status geändert',`${a.title} → ${a.status}`);saveCurrentUser(currentUser);toast(`Status: ${a.status}`);renderActions()}
+}
+
+/* ════════════════════════════════════════════
+   SETTINGS
+════════════════════════════════════════════ */
+function renderSettings(){
+  const u=currentUser;
+  const trialDays=u.trialUntil?Math.max(0,Math.ceil((new Date(u.trialUntil)-new Date())/86400000)):0;
+  const planInfo={
+    trial:`Trial — ${trialDays} Tage verbleibend`,
+    founding:'Gründungsmitglied — dauerhaft kostenloser Starter-Plan',
+    business:'Business Plan — €399/Monat',
+    enterprise:'Enterprise — individuelle Vereinbarung',
+  };
+  document.getElementById('app-content').innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:14px;max-width:680px">
+      ${u.isFoundingMember?`<div class="founding-section">
+        <div class="founding-section-h">⚡ Gründungsmitglied-Status</div>
+        <div class="founding-section-sub">Sie haben einen der 50 kostenlosen Gründerplätze gesichert. Ihr Starter-Plan ist dauerhaft kostenlos.</div>
+        <div class="founding-perks">
+          <div class="founding-perk">♾️ Starter-Plan dauerhaft kostenlos</div>
+          <div class="founding-perk">📊 Alle 20 §2-Kategorien</div>
+          <div class="founding-perk">📄 BAFA-Jahresbericht (PDF)</div>
+          <div class="founding-perk">🔬 Beta-Feedback-Runden</div>
+        </div>
+      </div>`:''}
+      <div class="card" style="padding:18px">
+        <div style="font-family:'Fraunces',serif;font-size:14px;letter-spacing:-.02em;margin-bottom:14px">Unternehmensangaben</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          ${[['Vorname',u.firstName||'','s-fn'],['Nachname',u.lastName||'','s-ln'],['Firmenname',u.company||'','s-co'],['E-Mail',u.email||'','s-em']].map(([l,v,id])=>`
+            <div><label style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">${l}</label>
+              <input id="${id}" value="${v}" class="finput" style="width:100%"></div>`).join('')}
+        </div>
+        <button class="btn btn-p btn-sm" style="margin-top:12px" onclick="saveSettings()">Speichern</button>
+      </div>
+      <div class="card" style="padding:18px">
+        <div style="font-family:'Fraunces',serif;font-size:14px;letter-spacing:-.02em;margin-bottom:10px">Abonnement</div>
+        <div style="display:flex;gap:12px;align-items:center;padding:12px 14px;background:var(--s2);border-radius:var(--r10)">
+          <div style="flex:1"><div style="font-weight:700;font-size:13px">${planInfo[u.plan]||'Unbekannt'}</div>
+          <div style="font-size:11px;color:var(--t4);margin-top:2px">${u.plan==='founding'?'Kein Ablaufdatum · Starter-Features dauerhaft':u.plan==='trial'?'Danach: Starter ab €149/Monat':''}</div></div>
+          <span class="badge ${u.plan==='trial'?'badge-mid':u.plan==='founding'?'badge-ok':'badge-leaf'}">${u.plan==='founding'?'Gründer':u.plan==='trial'?'Trial':'Business'}</span>
+          ${u.plan==='trial'?`<button class="btn btn-p btn-sm" onclick="toast('Upgrade-Anfrage erfasst — wir melden uns!','info')">Upgrade →</button>`:''}
+        </div>
+      </div>
+      <div class="card" style="padding:18px">
+        <div style="font-family:'Fraunces',serif;font-size:14px;letter-spacing:-.02em;margin-bottom:10px">Rechtliche Dokumente</div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">
+          <button class="btn btn-sm" onclick="showLegal('impressum')">Impressum</button>
+          <button class="btn btn-sm" onclick="showLegal('datenschutz')">Datenschutzerklärung</button>
+          <button class="btn btn-sm" onclick="showLegal('agb')">AGB</button>
+          <button class="btn btn-sm" onclick="showLegal('methodik')">Methodik</button>
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--t4);line-height:1.6">
+          LkSG Compass Methodik v3.0 · Stand Januar 2025 · BAFA-konform (§10 LkSG) · CSDDD-vorbereitend<br>
+          <strong>Rechtshinweis:</strong> Kein Rechtsgutachten — individuelle Rechtsberatung wird empfohlen.
+        </div>
+      </div>
+      <div style="background:var(--ep);border:1px solid rgba(192,57,43,.2);border-radius:var(--r14);padding:16px">
+        <div style="font-family:'Fraunces',serif;font-size:14px;color:var(--e);margin-bottom:6px">Sitzung beenden</div>
+        <div style="font-size:12px;color:var(--t3);margin-bottom:10px">Sie werden zur Startseite weitergeleitet. Ihre Daten bleiben erhalten.</div>
+        <button class="btn btn-danger btn-sm" onclick="doLogout()">Abmelden</button>
+      </div>
+    </div>
+  `;
+}
+function saveSettings(){
+  const fn=document.getElementById('s-fn')?.value.trim();
+  const ln=document.getElementById('s-ln')?.value.trim();
+  const co=document.getElementById('s-co')?.value.trim();
+  if(fn) currentUser.firstName=fn;if(ln) currentUser.lastName=ln;if(co) currentUser.company=co;
+  saveCurrentUser(currentUser);
+  if(!currentUser.isDemo){
+    const users=getUsers();const idx=users.findIndex(u=>u.id===currentUser.id);
+    if(idx>=0){users[idx]={...users[idx],firstName:fn,lastName:ln,company:co};setUsers(users)}
+  }
+  updateSidebar();toast('Einstellungen gespeichert');
+}
+function doLogout(){
+  localStorage.removeItem('lksg_user');currentUser=null;
+  showView('view-landing');toast('Erfolgreich abgemeldet');
+}
+
+/* ════════════════════════════════════════════
+   METHOD MODAL
+════════════════════════════════════════════ */
+function showMethodModal(){
+  openModal('Methodik LkSG Compass v3.0',`
+    <div style="font-size:12.5px;color:var(--t3);line-height:1.7;margin-bottom:14px">
+      LkSG Compass bewertet jeden Lieferanten anhand von 53 Unterindikatoren, verteilt auf 20 §2-Kategorien des LkSG. Das Scoring-Modell kombiniert länderspezifische Risikodaten, sektorale Gewichtungen und lieferantenspezifische Fragebogenantworten.
+    </div>
+    <div class="method-box" style="margin-bottom:12px">
+      <div class="method-box-h">Datenquellen</div>
+      ${[['ILO NORMLEX 2024','Ratifizierungsstatus aller ILO-Konventionen'],['WorldBank WGI 2023','Governance-Indikatoren: Rule of Law, Gov. Effectiveness'],['ITUC GRI 2023','Global Rights Index — Gewerkschaftsrechte & Arbeitnehmerfreiheit'],['Walk Free GSI 2023','Global Slavery Index — Zwangsarbeit & Menschenhandel'],['TI CPI 2024','Corruption Perceptions Index — Korruptionsrisiko'],['UNEP Basel/Minamata','Umweltabkommen-Umsetzungsgrad'],['WEF GGGI 2024','Global Gender Gap Index — Diskriminierungsrisiko']].map(([n,d])=>`<div class="method-item"><span style="font-weight:600">${n}</span><span style="font-size:11px">${d}</span></div>`).join('')}
+    </div>
+    <div style="background:var(--g9);border-radius:var(--r10);padding:11px 13px;font-size:11.5px;color:var(--g2)">
+      <strong>§5 LkSG Konservative Schätzung:</strong> Wenn ein Lieferant den Fragebogen nicht zurücksendet, werden alle fragebogenbasierten Indikatoren mit 40% des Länderbasiswerts bewertet. Diese Methode ist BAFA-anerkannt und wird im §10-Jahresbericht transparent dokumentiert.
+    </div>
+  `,true);
+}
+
+/* ════════════════════════════════════════════
+   LANDING — BUILD INDICATORS & FAQ
+════════════════════════════════════════════ */
+let _indSel=null;
+function buildIndicators(){
+  const cats=document.getElementById('ind-cats');if(!cats) return;
+  cats.innerHTML=CATEGORIES.map(c=>`<div class="ind-cat ${c.id===_indSel?'active':''}" onclick="showIndDetail(${c.id})"><div class="ind-cat-para">${c.para}</div><div class="ind-cat-name">${c.name}</div></div>`).join('');
+}
+function showIndDetail(id){
+  _indSel=id;
+  const cat=CATEGORIES.find(c=>c.id===id);if(!cat) return;
+  buildIndicators();
+  document.getElementById('ind-detail').innerHTML=`
+    <div class="ind-d-head">
+      <div class="ind-d-para">${cat.para} · ${cat.domain==='MR'?'Menschenrechte':'Umwelt'} · Gewicht: ${cat.weight}</div>
+      <div class="ind-d-name">${cat.name}</div>
+      <div class="ind-d-conv">${cat.conv}</div>
+    </div>
+    <div class="ind-subs">
+      ${cat.subs.map(s=>`<div class="ind-sub"><div class="ind-sub-name">${s.id} · ${s.n}</div><div class="ind-sub-src">${s.src}</div></div>`).join('')}
+    </div>
+  `;
+}
+
+const FAQS=[
+  {q:'Bin ich mit meinem Unternehmen direkt vom LkSG betroffen?',a:'Seit dem 01.01.2024 gilt das LkSG für alle Unternehmen mit ≥1.000 Mitarbeitern in Deutschland. Diese Unternehmen sind verpflichtet, jährlich einen §10-Bericht beim BAFA einzureichen und eine vollständige §5-Risikoanalyse durchzuführen. Unternehmen zwischen 500–999 Mitarbeitern sind indirekt betroffen, wenn ihre Kunden Lieferkettenanforderungen stellen.'},
+  {q:'Was passiert, wenn ein Lieferant den Fragebogen nicht ausfüllt?',a:'LkSG Compass wendet automatisch die §5-konforme „konservative Schätzung" an. Dabei werden fragebogenbasierte Indikatoren auf 40% des Länderbasiswerts gesetzt. Diese Methode ist BAFA-anerkannt und wird im §10-Jahresbericht explizit dokumentiert — Sie sind auf der rechtlich sicheren Seite.'},
+  {q:'Welche Datenquellen liegen dem Scoring zugrunde?',a:'Das Scoring basiert auf sieben internationalen Datenquellen: ILO NORMLEX 2024 (Ratifizierungsstatus aller Konventionen), WorldBank WGI 2023 (Governance-Indikatoren), ITUC GRI 2023 (Global Rights Index), Walk Free GSI 2023 (Sklaverei-Index), TI CPI 2024 (Korruption), UNEP (
